@@ -1,10 +1,10 @@
 #define MY_NTOHS(n) ((uint16_t)((n & 0x00ff) << 8 | (n & 0xff00) >> 8))
 #define MY_NTOHL(n) ((uint16_t)((n & 0x000000ff) << 24 | (n & 0x0000ff00) << 8 | (n & 0x00ff0000) >> 8 | (n & 0xff000000) >> 24))
 
-#define IP_HDR(pkt) ((struct ip_hdr*)((unsigned char*)pkt + sizeof(struct eth_hdr)))
-#define TCP_HDR_HLEN(hdr) ((MY_NTOHS((hdr)->hlen_with_flags) & 0b1111000000000000) >> 4)
-#define TCP_HDR_FLAGS(hdr) (MY_NTOHS((hdr)->hlen_with_flags) & 0b0000111111111111)
-#define TCP_HDR(pkt) ((struct tcp_hdr*)((unsigned char*)IP_HDR(pkt) + ip_hdr->hlen * 4))
+#define IP_HDR(pkt) ((struct IpHdr*)((unsigned char*)pkt + sizeof(struct EthHdr)))
+#define TCP_HDR_HLEN(hdr) ((MY_NTOHS((hdr)->hlenWithFlags) & 0b1111000000000000) >> 4)
+#define TCP_HDR_FLAGS(hdr) (MY_NTOHS((hdr)->hlenWithFlags) & 0b0000111111111111)
+#define TCP_HDR(pkt) ((struct TcpHdr*)((unsigned char*)IP_HDR(pkt) + IpHdr->hlen * 4))
 #define TCP_PAYLOAD(pkt) ((char*)((unsigned char*)TCP_HDR(pkt) + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt))) * 4))
 #define TCP_PAYLOAD_LEN(pkt) (MY_NTOHS(IP_HDR(pkt)->tlen) - (IP_HDR(pkt)->hlen + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt)))) * 4)
 
@@ -51,4 +51,3 @@ struct ArpHdr {
   uint8_t tmac[6];
   uint8_t tip[4];
 } __attribute__((packed));
-

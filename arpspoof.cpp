@@ -1,14 +1,15 @@
 #include <pcap.h>
 #include <cstring>
 #include <iostream>
+#include "proto.h"
 
-void print_eth_hdr(const struct eth_hdr* hdr) {
+void print_EthHdr(const struct EthHdr* hdr) {
   std::printf("eth dmac %02x:%02x:%02x:%02x:%02x:%02x\n", hdr->dmac[0], hdr->dmac[1], hdr->dmac[2], hdr->dmac[3], hdr->dmac[4], hdr->dmac[5]);
   std::printf("eth smac %02x:%02x:%02x:%02x:%02x:%02x\n", hdr->smac[0], hdr->smac[1], hdr->smac[2], hdr->smac[3], hdr->smac[4], hdr->smac[5]);
   std::printf("eth type 0x%04x\n", MY_NTOHS(hdr->type));
 }
 
-void print_ip_hdr(const struct ip_hdr* hdr) {
+void print_IpHdr(const struct IpHdr* hdr) {
   std::printf("ip ver %u\n", hdr->ver);
   std::printf("ip hlen %u\n", hdr->hlen);
   std::printf("ip type of service 0x%x\n", hdr->tos);
@@ -22,17 +23,17 @@ void print_ip_hdr(const struct ip_hdr* hdr) {
   std::printf("ip dst %d.%d.%d.%d\n", hdr->dip[0], hdr->dip[1], hdr->dip[2], hdr->dip[3]);
 }
 
-void print_tcp_hdr(const struct tcp_hdr* hdr) {
+void print_TcpHdr(const struct TcpHdr* hdr) {
   std::printf("tcp sport: %u\n", MY_NTOHS(hdr->sport));
   std::printf("tcp dport: %u\n", MY_NTOHS(hdr->dport));
-  std::printf("tcp seq: %x\n", MY_NTOHL(hdr->seq_num));
-  std::printf("tcp ack: %x\n", MY_NTOHL(hdr->ack_num));
-  std::printf("tcp hlen_with_flags 0x%x\n", hdr->hlen_with_flags);
+  std::printf("tcp seq: %x\n", MY_NTOHL(hdr->seqNum));
+  std::printf("tcp ack: %x\n", MY_NTOHL(hdr->ackNum));
+  std::printf("tcp hlenWithFlags 0x%x\n", hdr->hlenWithFlags);
   std::printf("tcp hlen: 0x%x\n", MY_NTOHS(TCP_HDR_HLEN(hdr)));
   std::printf("tcp flags: 0x%x\n", TCP_HDR_FLAGS(hdr));
   std::printf("tcp wsize: 0x%x\n", hdr->wsize);
   std::printf("tcp chksum: 0x%x\n", hdr->chksum);
-  std::printf("tcp urg_ptr: 0x%x\n", hdr->urg_ptr);
+  std::printf("tcp urgPtr: 0x%x\n", hdr->urgPtr);
 }
 
 int print_pkt(pcap_t* handle) {
@@ -41,17 +42,17 @@ int print_pkt(pcap_t* handle) {
   int res = pcap_next_ex(handle, &pkt_info, &pkt);
   if(res != 1)
     return res;
-  const struct eth_hdr* eth_hdr = (struct eth_hdr*)pkt;
-  if(MY_NTOHS(eth_hdr->type) == 0x0800) {
-    const struct ip_hdr* ip_hdr = IP_HDR(pkt);
-    if(ip_hdr->proto == 0x06) {
-      const struct tcp_hdr* tcp_hdr = TCP_HDR(pkt);
+  const struct EthHdr* EthHdr = (struct EthHdr*)pkt;
+  if(MY_NTOHS(EthHdr->type) == 0x0800) {
+    const struct IpHdr* IpHdr = IP_HDR(pkt);
+    if(IpHdr->proto == 0x06) {
+      const struct TcpHdr* TcpHdr = TCP_HDR(pkt);
       #ifdef HTTP
-      if(TCP_HDR_FLAGS(tcp_hdr) == 0x018 && (MY_NTOHS(tcp_hdr->dport) == 80 || MY_NTOHS(tcp_hdr->sport) == 80)) {
+      if(TCP_HDR_FLAGS(TcpHdr) == 0x018 && (MY_NTOHS(TcpHdr->dport) == 80 || MY_NTOHS(TcpHdr->sport) == 80)) {
       #endif
-        print_eth_hdr(eth_hdr);
-        print_ip_hdr(ip_hdr);
-        print_tcp_hdr(tcp_hdr);
+        print_EthHdr(EthHdr);
+        print_IpHdr(IpHdr);
+        print_TcpHdr(TcpHdr);
         uint16_t payload_len = TCP_PAYLOAD_LEN(pkt);
         std::cout << "tcp payload len " << payload_len << std::endl;
         std::cout << std::endl << "----------------------------------" << std::endl;;
