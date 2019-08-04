@@ -11,9 +11,10 @@ Packet::Packet()
 
 Packet::Packet(const unsigned char* rawPacket, uint32_t rawPacketLen):
     m_rawPacketLen{rawPacketLen},
-    m_rawPacket{new unsigned char[rawPacketLen]}
+    m_rawPacket{const_cast<unsigned char*>(rawPacket)}
+//    m_rawPacket{new unsigned char[rawPacketLen]}
 {
-    std::memcpy(m_rawPacket, rawPacket, rawPacketLen);
+//    std::memcpy(m_rawPacket, rawPacket, rawPacketLen);
 }
 
 Packet::~Packet()

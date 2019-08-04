@@ -8,6 +8,7 @@
 #define MY_NTOHL(n) ((uint16_t)((n & 0x000000ff) << 24 | (n & 0x0000ff00) << 8 | (n & 0x00ff0000) >> 8 | (n & 0xff000000) >> 24))
 
 #define IP_HDR(pkt) ((struct IpHeader*)((unsigned char*)pkt + sizeof(struct EthHeader)))
+#define ARP_HDR(pkt) ((struct ArpHeader*)((unsigned char*)pkt + sizeof(struct EthHeader)))
 #define TCP_HDR_HLEN(hdr) ((MY_NTOHS((hdr)->hlenWithFlags) & 0b1111000000000000) >> 4)
 #define TCP_HDR_FLAGS(hdr) (MY_NTOHS((hdr)->hlenWithFlags) & 0b0000111111111111)
 #define TCP_HDR(pkt) ((struct TcpHeader*)((unsigned char*)IP_HDR(pkt) + IpHeader->hlen * 4))
