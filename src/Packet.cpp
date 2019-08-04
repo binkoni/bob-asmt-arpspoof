@@ -14,7 +14,6 @@ Packet::Packet(const unsigned char* rawPacket, uint32_t rawPacketLen):
     m_rawPacket{new unsigned char[rawPacketLen]}
 {
     std::memcpy(m_rawPacket, rawPacket, rawPacketLen);
-    std::cout << "Packet ctor" << std::endl;
 }
 
 Packet::~Packet()
@@ -28,7 +27,8 @@ Packet* Packet::parse(const unsigned char* rawPacket, uint32_t rawPacketLen)
     switch(MY_NTOHS(header->type))
     {
         case 0x0800:
-            return parseIp(rawPacket, rawPacketLen);
+            return new UnknownPacket{rawPacket, rawPacketLen};
+            //return parseIp(rawPacket, rawPacketLen);
         case 0x0806:
             return new ArpPacket{rawPacket, rawPacketLen};
         default:

@@ -7,7 +7,6 @@
 UnknownPacket::UnknownPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
     Packet{rawPacket, rawPacketLen}
 {
-    std::cout << "Unknown ctor" << std::endl;
 }
 
 void UnknownPacket::print(std::stringstream& sstr) const
@@ -17,5 +16,5 @@ void UnknownPacket::print(std::stringstream& sstr) const
 
 std::string UnknownPacket::toString() const
 {
-    return "Unknown Packet";
+    return "";
 }

@@ -6,9 +6,9 @@
 #include "EthPacket.h"
 
 struct ArpHeader {
-    uint16_t htype;
+    uint16_t hwtype;
     uint16_t ptype;
-    uint8_t hlen;
+    uint8_t hwlen;
     uint8_t plen;
     uint16_t opcode;
     uint8_t smac[6];
