@@ -45,7 +45,7 @@ int print_pkt(pcap_t* handle) {
     return res;
   std::cout << "caplen: " << pkt_info->caplen << std::endl;
   std::cout << "len" << pkt_info->len << std::endl;
-  Packet packet{pkt, pkt_info->caplen};
+  auto packet = Packet::parse(pkt, pkt_info->caplen);
   const struct EthHeader* EthHeader = (struct EthHeader*)pkt;
   if(MY_NTOHS(EthHeader->type) == 0x0800) {
     const struct IpHeader* IpHeader = IP_HDR(pkt);

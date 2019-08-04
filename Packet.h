@@ -13,14 +13,46 @@
 #define TCP_PAYLOAD(pkt) ((char*)((unsigned char*)TCP_HDR(pkt) + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt))) * 4))
 #define TCP_PAYLOAD_LEN(pkt) (MY_NTOHS(IP_HDR(pkt)->tlen) - (IP_HDR(pkt)->hlen + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt)))) * 4)
 
+enum class PacketType
+{
+    ETH,
+    ARP,
+    IP,
+    TCP
+};
 
-struct EthHeader {
+class Packet
+{
+private:
+    unsigned char* m_rawPacket;
+    uint32_t m_rawPacketLen;
+public:
+    explicit Packet();
+    explicit Packet(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    virtual ~Packet();
+    static Packet* parse(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    static Packet* parseIp(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    virtual std::string toString() = 0;
+    friend std::ostream& operator<<(std::ostream& ostr, const Packet& packet);
+};
+
+struct EthHeader
+{
     uint8_t dmac[6];
     uint8_t smac[6];
     uint16_t type;
 } __attribute__((packed));
 
-struct IpHeader {
+class EthPacket: public Packet
+{
+    EthHeader* header;
+public:
+    EthPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    std::string toString();
+};
+
+struct IpHeader
+{
     unsigned char hlen:4;
     unsigned char ver:4;
     uint8_t tos;
@@ -34,6 +66,14 @@ struct IpHeader {
     uint8_t dip[4];
 } __attribute__((packed));
 
+class IpPacket: public EthPacket
+{
+    IpHeader* header;
+public:
+    std::string toString();
+
+};
+
 struct TcpHeader {
     uint16_t sport;
     uint16_t dport;
@@ -45,6 +85,14 @@ struct TcpHeader {
     uint16_t urgPtr;
     uint8_t options[8];
 } __attribute__((packed));
+
+class TcpPacket: public IpPacket
+{
+    TcpHeader* header;
+public:
+    std::string toString();
+
+};
 
 struct ArpHeader {
     uint16_t htype;
@@ -58,17 +106,13 @@ struct ArpHeader {
     uint8_t tip[4];
 } __attribute__((packed));
 
-class Packet
+class ArpPacket: public EthPacket
 {
-private:
-    unsigned char* m_rawPacket;
-    size_t m_rawPacketLen;
+    ArpHeader* header;
 public:
-    explicit Packet(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    EthHeader* ethHeader();
-    IpHeader* ipHeader();
-    TcpHeader* tcpHeader();
-    ArpHeader* arpHeader();
+    ArpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    std::string toString();
+
 };
 
 #endif
