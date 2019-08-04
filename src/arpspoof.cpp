@@ -2,6 +2,10 @@
 #include <cstring>
 #include <iostream>
 #include "Packet.h"
+#include "EthPacket.h"
+#include "IpPacket.h"
+#include "TcpPacket.h"
+
 
 void print_EthHeader(const struct EthHeader* hdr) {
   std::printf("eth dmac %02x:%02x:%02x:%02x:%02x:%02x\n", hdr->dmac[0], hdr->dmac[1], hdr->dmac[2], hdr->dmac[3], hdr->dmac[4], hdr->dmac[5]);

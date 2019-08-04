@@ -24,8 +24,8 @@ enum class PacketType
 class Packet
 {
 private:
-    unsigned char* m_rawPacket;
     uint32_t m_rawPacketLen;
+    unsigned char* m_rawPacket;
 public:
     explicit Packet();
     explicit Packet(const unsigned char* rawPacket, uint32_t rawPacketLen);

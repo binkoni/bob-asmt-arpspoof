@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cstring>
 #include "Packet.h"
+#include "ArpPacket.h"
+#include "TcpPacket.h"
+
 
 Packet::Packet()
 {

@@ -11,6 +11,7 @@ set_target_properties(
 
 target_link_libraries(
     arpspoof
+    pcap
 )
 
 install(
