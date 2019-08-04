@@ -2,6 +2,7 @@
 #define PACKET_H
 
 #include <cstdint>
+#include <sstream>
 
 #define MY_NTOHS(n) ((uint16_t)((n & 0x00ff) << 8 | (n & 0xff00) >> 8))
 #define MY_NTOHL(n) ((uint16_t)((n & 0x000000ff) << 24 | (n & 0x0000ff00) << 8 | (n & 0x00ff0000) >> 8 | (n & 0xff000000) >> 24))
@@ -23,7 +24,7 @@ enum class PacketType
 
 class Packet
 {
-private:
+protected:
     uint32_t m_rawPacketLen;
     unsigned char* m_rawPacket;
 public:
@@ -33,6 +34,7 @@ public:
     static Packet* parse(const unsigned char* rawPacket, uint32_t rawPacketLen);
     static Packet* parseIp(const unsigned char* rawPacket, uint32_t rawPacketLen);
     virtual std::string toString() const = 0;
+    virtual void print(std::stringstream& sstr) const = 0;
     friend std::ostream& operator<<(std::ostream& ostr, const Packet& packet);
 };
 

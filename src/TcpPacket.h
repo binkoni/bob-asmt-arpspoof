@@ -2,6 +2,7 @@
 #define TCP_PACKET_H
 
 #include <cstdint>
+#include <sstream>
 #include "IpPacket.h"
 
 struct TcpHeader {
@@ -18,11 +19,11 @@ struct TcpHeader {
 
 class TcpPacket: public IpPacket
 {
-    TcpHeader* header;
 public:
     TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    std::string toString() const;
-
+    TcpHeader* tcpHeader() const;
+    virtual void print(std::stringstream& sstr) const;
+    virtual std::string toString() const;
 };
 
 #endif

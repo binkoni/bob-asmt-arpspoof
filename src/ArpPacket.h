@@ -2,6 +2,7 @@
 #define ARP_PACKET_H
 
 #include <cstdint>
+#include <sstream>
 #include "EthPacket.h"
 
 struct ArpHeader {
@@ -18,11 +19,11 @@ struct ArpHeader {
 
 class ArpPacket: public EthPacket
 {
-    ArpHeader* header;
 public:
     ArpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    std::string toString() const;
-
+    ArpHeader* arpHeader() const;
+    virtual void print(std::stringstream& sstr) const;
+    virtual std::string toString() const;
 };
 
 #endif

@@ -6,7 +6,6 @@
 #include "IpPacket.h"
 #include "TcpPacket.h"
 
-
 void print_EthHeader(const struct EthHeader* hdr) {
   std::printf("eth dmac %02x:%02x:%02x:%02x:%02x:%02x\n", hdr->dmac[0], hdr->dmac[1], hdr->dmac[2], hdr->dmac[3], hdr->dmac[4], hdr->dmac[5]);
   std::printf("eth smac %02x:%02x:%02x:%02x:%02x:%02x\n", hdr->smac[0], hdr->smac[1], hdr->smac[2], hdr->smac[3], hdr->smac[4], hdr->smac[5]);
@@ -40,16 +39,21 @@ void print_TcpHeader(const struct TcpHeader* hdr) {
   std::printf("tcp urgPtr: 0x%x\n", hdr->urgPtr);
 }
 
-
 int print_pkt(pcap_t* handle) {
   struct pcap_pkthdr* pkt_info;
   const u_char* pkt;
   int res = pcap_next_ex(handle, &pkt_info, &pkt);
   if(res != 1)
     return res;
-  std::cout << "caplen: " << pkt_info->caplen << std::endl;
-  std::cout << "len" << pkt_info->len << std::endl;
+  //std::cout << "caplen: " << pkt_info->caplen << std::endl;
+  //std::cout << "len" << pkt_info->len << std::endl;
+
+  std::stringstream sstr;
   auto packet = Packet::parse(pkt, pkt_info->caplen);
+  packet->print(sstr);
+  std::cout << sstr.str();
+  delete packet;
+  /*
   const struct EthHeader* EthHeader = (struct EthHeader*)pkt;
   if(MY_NTOHS(EthHeader->type) == 0x0800) {
     const struct IpHeader* IpHeader = IP_HDR(pkt);
@@ -76,6 +80,7 @@ int print_pkt(pcap_t* handle) {
       #endif
     }
   }
+  */
   return res;
 }
 

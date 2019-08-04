@@ -1,6 +1,6 @@
 project(arpspoof)
 add_executable(arpspoof)
-target_sources(arpspoof PRIVATE arpspoof.cpp Packet.cpp EthPacket.cpp IpPacket.cpp TcpPacket.cpp ArpPacket.cpp)
+target_sources(arpspoof PRIVATE arpspoof.cpp Packet.cpp EthPacket.cpp IpPacket.cpp TcpPacket.cpp ArpPacket.cpp UnknownPacket.cpp)
 target_compile_options(arpspoof PRIVATE -Wall)
 
 set_target_properties(

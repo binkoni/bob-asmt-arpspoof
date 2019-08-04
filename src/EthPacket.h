@@ -1,7 +1,8 @@
 #ifndef ETH_PACKET_H
-#define ETH_PACKET_H
+#define ETH_PACKET_H 
 
 #include <cstdint>
+#include <sstream>
 #include "Packet.h"
 
 struct EthHeader
@@ -13,10 +14,11 @@ struct EthHeader
 
 class EthPacket: public Packet
 {
-    EthHeader* header;
 public:
     EthPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    std::string toString() const;
+    EthHeader* ethHeader() const;
+    virtual void print(std::stringstream& sstr) const;
+    virtual std::string toString() const;
 };
 
 #endif

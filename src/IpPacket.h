@@ -2,6 +2,7 @@
 #define IP_PACKET_H
 
 #include <cstdint>
+#include <sstream>
 #include "EthPacket.h"
 
 struct IpHeader
@@ -21,10 +22,11 @@ struct IpHeader
 
 class IpPacket: public EthPacket
 {
-    IpHeader* header;
 public:
     IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    std::string toString() const;
+    IpHeader* ipHeader() const;
+    virtual void print(std::stringstream& sstr) const;
+    virtual std::string toString() const;
 };
 
 #endif

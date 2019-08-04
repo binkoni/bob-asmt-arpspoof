@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cstring>
 #include "Packet.h"
+#include "UnknownPacket.h"
 #include "ArpPacket.h"
 #include "TcpPacket.h"
-
 
 Packet::Packet()
 {
@@ -25,26 +25,26 @@ Packet::~Packet()
 Packet* Packet::parse(const unsigned char* rawPacket, uint32_t rawPacketLen)
 {
     auto header = reinterpret_cast<const EthHeader*>(rawPacket);
-    std::cout << std::hex << MY_NTOHS(header->type) << std::dec << std::endl;;
     switch(MY_NTOHS(header->type))
     {
         case 0x0800:
-            std::cout << "IP" << std::endl;
             return parseIp(rawPacket, rawPacketLen);
         case 0x0806:
             return new ArpPacket{rawPacket, rawPacketLen};
+        default:
+            return new UnknownPacket{rawPacket, rawPacketLen};
     }
     return nullptr;
 }
 
 Packet* Packet::parseIp(const unsigned char* rawPacket, uint32_t rawPacketLen)
 {
-    auto header = reinterpret_cast<const IpHeader*>(rawPacket);
+    auto header = reinterpret_cast<const IpHeader*>(IP_HDR(rawPacket));
     if(header->proto == 0x06)
     {
         return new TcpPacket{rawPacket, rawPacketLen};
     }
-    return nullptr;
+    return new UnknownPacket{rawPacket, rawPacketLen};
 }
 
 std::ostream& operator<<(std::ostream& ostr, const Packet& packet)
