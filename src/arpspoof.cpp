@@ -32,10 +32,16 @@ void printHelp(const char* argv0, char* errbuf)
     std::exit(EXIT_FAILURE);
 }
 
-std::string toFilterString(uint8_t mac[6], uint32_t ipInt)
+std::string toFilterString(uint8_t mac[6], uint32_t ip)
 {
-    return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Helper::toIpString(ipInt) % Helper::toMacString(mac));
+    return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Helper::toIpString(ip) % Helper::toMacString(mac));
 }
+
+std::string toFilterString(uint8_t mac[6], uint8_t ip[4])
+{
+    return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Helper::toIpString(ip) % Helper::toMacString(mac));
+}
+
 
 void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
 {
@@ -63,19 +69,64 @@ void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8
 
     if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -1)
     {
-        std::cout << "pcap_sendpacket failed!" << std::endl;
+        throw std::runtime_error{"pcap_sendpacket failed!"};
     }
-    //delete pkt;
+    delete pkt;
 }
 
-/*
-void replyArp(pcap_t* handle, from, to)
+
+void replyArp(pcap_t* handle, uint8_t fromMac[6], uint8_t fromIp[4], uint8_t toMac[6], uint8_t toIp[4])
 {
     auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
     auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
+
+
     auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
 }
-*/
+
+void queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
+{
+    struct bpf_program prog;
+    auto filterString = toFilterString(myMac, otherIp);
+    std::cout << "filter string is " << filterString << std::endl;
+
+    if(pcap_compile(handle, &prog, filterString.c_str(), 0, *reinterpret_cast<uint32_t*>(myIp)) == -1)
+    {
+        throw std::runtime_error{"Failed to compile filter"};
+    }
+
+    requestArp(
+        handle,
+        myMac,
+        myIp,
+        otherIp
+    );
+
+    if(pcap_setfilter(handle, &prog) == -1)
+    {
+        throw std::runtime_error{"Failed to set filter"};
+    }
+
+    std::cout << Helper::toIpString(myIp) << std::endl;
+
+    struct pcap_pkthdr* pktHdr;
+    const u_char* pkt;
+
+    pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader));
+    pcap_next_ex(handle, &pktHdr, &pkt);
+    
+    auto packet = Packet::parse(pkt, pktHdr->caplen);
+
+    std::stringstream sstr;
+    packet->print(sstr);
+    std::cout << sstr.str() << std::endl;
+
+}
+
+void queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
+{
+    queryMac(handle, myMac, reinterpret_cast<uint8_t*>(&myIp), reinterpret_cast<uint8_t*>(&otherIp));
+}
 
 int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -102,7 +153,7 @@ int main(int argc, char** argv) {
     }
     close(sock);
 
-    auto myIp = ((struct sockaddr_in *)&myIpIfr.ifr_addr)->sin_addr;
+    auto myIp = ((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr;
     auto myMac = myMacIfr.ifr_addr.sa_data;
 
     for(int i = 0; i < 6; ++i)
@@ -142,7 +193,7 @@ int main(int argc, char** argv) {
     arpHdr->tip[2] = 0;
     arpHdr->tip[3] = 1;
     */
-    struct pcap_pkthdr* pkt_info;
+    struct pcap_pkthdr* pktHdr;
     const u_char* pktRecv;
 
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
@@ -151,19 +202,23 @@ int main(int argc, char** argv) {
         std::cout << errbuf << std::endl;
         return -1;
     }
-    for(int i = 0; i < 100; ++i) {
-    requestArp(
+
+    queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, senderAddress.sin_addr.s_addr);
+
+    /*replyArp(
         handle,
+        reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr)
         reinterpret_cast<uint8_t*>(myMac),
         reinterpret_cast<uint8_t*>(&myIp.s_addr),
-        reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr));
-    }
+        );*/
+
 
     /*
     struct bpf_program prog;
 
     auto filterString = toFilterString(reinterpret_cast<uint8_t*>(myMac), myIp.s_addr);
     std::cout << "Filterstring: " << filterString.c_str() << ")" << std::endl;
+
     if(pcap_compile(handle, &prog, filterString.c_str(), 0, myIp.s_addr) == -1)
     {
         std::cout << "Failed to compile filter" << std::endl;
@@ -179,8 +234,8 @@ int main(int argc, char** argv) {
     while(true)
     {
         //pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader));
-        pcap_next_ex(handle, &pkt_info, &pktRecv);
-        auto packet = Packet::parse(pktRecv, pkt_info->caplen);
+        pcap_next_ex(handle, &pktHdr, &pktRecv);
+        auto packet = Packet::parse(pktRecv, pktHdr->caplen);
         std::stringstream sstr;
         packet->print(sstr);
         std::cout << sstr.str() << std::endl;
