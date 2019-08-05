@@ -37,6 +37,46 @@ std::string toFilterString(uint8_t mac[6], uint32_t ipInt)
     return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Helper::toIpString(ipInt) % Helper::toMacString(mac));
 }
 
+void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
+{
+    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
+    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
+    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
+
+    ethHdr->type = htons(ETHERTYPE_ARP);
+    memcpy(ethHdr->smac, senderMac, 6);
+    memset(ethHdr->dmac, 0xFF, 6);
+
+    arpHdr->hwtype = htons(0x0001);
+    arpHdr->ptype = htons(ETHERTYPE_IP);
+    arpHdr->hwlen = 6;
+    arpHdr->plen = 4;
+    arpHdr->opcode = htons(ARPOP_REQUEST);
+
+    memcpy(arpHdr->smac, senderMac, 6);
+    memcpy(arpHdr->sip, senderIp, 4);
+
+
+    memset(arpHdr->tmac, 0, 6);
+    memcpy(arpHdr->tip, targetIp, 4);
+
+
+    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -1)
+    {
+        std::cout << "pcap_sendpacket failed!" << std::endl;
+    }
+    //delete pkt;
+}
+
+/*
+void replyArp(pcap_t* handle, from, to)
+{
+    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
+    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
+    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
+}
+*/
+
 int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
     if(argc < 4) {
@@ -61,15 +101,16 @@ int main(int argc, char** argv) {
         std::exit(EXIT_FAILURE);
     }
     close(sock);
+
     auto myIp = ((struct sockaddr_in *)&myIpIfr.ifr_addr)->sin_addr;
     auto myMac = myMacIfr.ifr_addr.sa_data;
 
-    for(int i = 0; i < 6; ++i) {
+    for(int i = 0; i < 6; ++i)
+    {
       std::printf("%02x:", (unsigned char)myMac[i]);
     }
     std::printf("\n");
     printf("%s\n", inet_ntoa(myIp));
-
 
     struct sockaddr_in senderAddress;
     inet_pton(AF_INET, argv[2], &senderAddress.sin_addr);
@@ -77,6 +118,7 @@ int main(int argc, char** argv) {
     struct sockaddr_in targetAddress;
     inet_pton(AF_INET, argv[3], &targetAddress.sin_addr);
 
+    /*
     auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
     auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
     ethHdr->type = htons(ETHERTYPE_ARP);
@@ -94,18 +136,30 @@ int main(int argc, char** argv) {
     for(int i = 0; i < 6; ++i)
         arpHdr->tmac[i] = 0x00;
     *(uint32_t*)arpHdr->sip = myIp.s_addr;
+
     arpHdr->tip[0] = 127;
     arpHdr->tip[1] = 0;
     arpHdr->tip[2] = 0;
     arpHdr->tip[3] = 1;
+    */
     struct pcap_pkthdr* pkt_info;
     const u_char* pktRecv;
 
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
-    if(handle == NULL) {
+    if(handle == NULL)
+    {
         std::cout << errbuf << std::endl;
         return -1;
     }
+    for(int i = 0; i < 100; ++i) {
+    requestArp(
+        handle,
+        reinterpret_cast<uint8_t*>(myMac),
+        reinterpret_cast<uint8_t*>(&myIp.s_addr),
+        reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr));
+    }
+
+    /*
     struct bpf_program prog;
 
     auto filterString = toFilterString(reinterpret_cast<uint8_t*>(myMac), myIp.s_addr);
@@ -131,5 +185,6 @@ int main(int argc, char** argv) {
         packet->print(sstr);
         std::cout << sstr.str() << std::endl;
     }
+    */
     pcap_close(handle);
 }
