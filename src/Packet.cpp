@@ -19,7 +19,7 @@ Packet::Packet(const unsigned char* rawPacket, uint32_t rawPacketLen):
 
 Packet::~Packet()
 {
-    delete m_rawPacket;
+    //delete m_rawPacket;
 }
 
 Packet* Packet::parse(const unsigned char* rawPacket, uint32_t rawPacketLen)

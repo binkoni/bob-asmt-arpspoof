@@ -6,7 +6,6 @@
 IpPacket::IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
     EthPacket{rawPacket, rawPacketLen}
 {
-    std::cout << "Ip ctor" << std::endl;
 }
 
 IpHeader* IpPacket::ipHeader() const

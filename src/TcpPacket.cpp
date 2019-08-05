@@ -6,13 +6,11 @@
 TcpPacket::TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
     IpPacket{rawPacket, rawPacketLen}
 {
-    std::cout << "Tcp ctor" << std::endl;
 }
 
 TcpHeader* TcpPacket::tcpHeader() const
 {
     const auto ipHdr = ipHeader();
-    
     return reinterpret_cast<TcpHeader*>(reinterpret_cast<unsigned char*>(ipHdr) + ipHdr->hlen * 4);
 }
 

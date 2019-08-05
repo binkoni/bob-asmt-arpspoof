@@ -7,7 +7,6 @@
 ArpPacket::ArpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
     EthPacket{rawPacket, rawPacketLen}
 {
-    std::cout << "ARP ctor" << std::endl;
 }
 
 ArpHeader* ArpPacket::arpHeader() const

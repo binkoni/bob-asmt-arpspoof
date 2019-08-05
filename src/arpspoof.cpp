@@ -14,6 +14,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <net/ethernet.h>
+#include <net/if_arp.h>
+#include "Helper.h"
+#include <boost/format.hpp>
 
 void printHelp(const char* argv0, char* errbuf)
 {
@@ -29,36 +32,43 @@ void printHelp(const char* argv0, char* errbuf)
     std::exit(EXIT_FAILURE);
 }
 
+std::string toFilterString(uint8_t mac[6], uint32_t ipInt)
+{
+    return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Helper::toIpString(ipInt) % Helper::toMacString(mac));
+}
+
 int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
     if(argc < 4) {
          printHelp(argv[0], errbuf);
     }
 
-    struct ifreq myMac, myIp;
+    struct ifreq myMacIfr, myIpIfr;
     int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
-    strncpy(myMac.ifr_name, argv[1], IFNAMSIZ - 1);
-    strncpy(myIp.ifr_name, argv[1], IFNAMSIZ - 1);
+    strncpy(myMacIfr.ifr_name, argv[1], IFNAMSIZ - 1);
+    strncpy(myIpIfr.ifr_name, argv[1], IFNAMSIZ - 1);
 
-    if(ioctl(sock, SIOCGIFHWADDR, &myMac) != 0)
+    if(ioctl(sock, SIOCGIFHWADDR, &myMacIfr) != 0)
     {
         std::cout << "Failed to get MAC address" << std::endl;
         close(sock);
         std::exit(EXIT_FAILURE);
     }
-    if(ioctl(sock, SIOCGIFADDR, &myIp) != 0)
+    if(ioctl(sock, SIOCGIFADDR, &myIpIfr) != 0)
     {
         std::cout << "Failed to get IP address" << std::endl;
         close(sock);
         std::exit(EXIT_FAILURE);
     }
     close(sock);
+    auto myIp = ((struct sockaddr_in *)&myIpIfr.ifr_addr)->sin_addr;
+    auto myMac = myMacIfr.ifr_addr.sa_data;
 
     for(int i = 0; i < 6; ++i) {
-      std::printf("%02x:", (unsigned char)myMac.ifr_addr.sa_data[i]);
+      std::printf("%02x:", (unsigned char)myMac[i]);
     }
     std::printf("\n");
-    printf("%s\n", inet_ntoa(((struct sockaddr_in *)&myIp.ifr_addr)->sin_addr));
+    printf("%s\n", inet_ntoa(myIp));
 
 
     struct sockaddr_in senderAddress;
@@ -70,7 +80,7 @@ int main(int argc, char** argv) {
     auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
     auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
     ethHdr->type = htons(ETHERTYPE_ARP);
-    memcpy(ethHdr->smac, myMac.ifr_addr.sa_data, 6);
+    memcpy(ethHdr->smac, myMacIfr.ifr_addr.sa_data, 6);
     for(int i = 0; i < 6; ++i)
         ethHdr->dmac[i] = 0xFF;
 
@@ -79,11 +89,11 @@ int main(int argc, char** argv) {
     arpHdr->ptype = htons(0x0800);
     arpHdr->hwlen = 6;
     arpHdr->plen = 4;
-    arpHdr->opcode = htons(0x0001);
-    memcpy(arpHdr->smac, myMac.ifr_addr.sa_data, 6);
+    arpHdr->opcode = htons(ARPOP_REQUEST);
+    memcpy(arpHdr->smac, myMacIfr.ifr_addr.sa_data, 6);
     for(int i = 0; i < 6; ++i)
         arpHdr->tmac[i] = 0x00;
-    *(uint32_t*)arpHdr->sip = ((struct sockaddr_in *)&myIp.ifr_addr)->sin_addr.s_addr;
+    *(uint32_t*)arpHdr->sip = myIp.s_addr;
     arpHdr->tip[0] = 127;
     arpHdr->tip[1] = 0;
     arpHdr->tip[2] = 0;
@@ -96,9 +106,25 @@ int main(int argc, char** argv) {
         std::cout << errbuf << std::endl;
         return -1;
     }
+    struct bpf_program prog;
+
+    auto filterString = toFilterString(reinterpret_cast<uint8_t*>(myMac), myIp.s_addr);
+    std::cout << "Filterstring: " << filterString.c_str() << ")" << std::endl;
+    if(pcap_compile(handle, &prog, filterString.c_str(), 0, myIp.s_addr) == -1)
+    {
+        std::cout << "Failed to compile filter" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+    if(pcap_setfilter(handle, &prog) == -1)
+    {
+        std::cout << "Failed to set filter" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+    std::cout << Helper::toIpString(myIp.s_addr) << std::endl;
+
     while(true)
     {
-        pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader));
+        //pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader));
         pcap_next_ex(handle, &pkt_info, &pktRecv);
         auto packet = Packet::parse(pktRecv, pkt_info->caplen);
         std::stringstream sstr;
