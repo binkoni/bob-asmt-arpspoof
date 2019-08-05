@@ -7,8 +7,6 @@
 EthPacket::EthPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
     Packet{rawPacket, rawPacketLen}
 {
-    std::cout << "Eth ctor" << std::endl;
-
 }
 
 EthHeader* EthPacket::ethHeader() const

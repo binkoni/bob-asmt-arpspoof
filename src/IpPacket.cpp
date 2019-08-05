@@ -23,5 +23,3 @@ std::string IpPacket::toString() const
 {
     return "IpPacket";
 }
-
-

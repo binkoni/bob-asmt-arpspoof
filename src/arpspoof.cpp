@@ -42,7 +42,6 @@ std::string toFilterString(uint8_t mac[6], uint8_t ip[4])
     return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Helper::toIpString(ip) % Helper::toMacString(mac));
 }
 
-
 void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
 {
     auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
@@ -62,7 +61,6 @@ void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8
     memcpy(arpHdr->smac, senderMac, 6);
     memcpy(arpHdr->sip, senderIp, 4);
 
-
     memset(arpHdr->tmac, 0, 6);
     memcpy(arpHdr->tip, targetIp, 4);
 
@@ -74,17 +72,14 @@ void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8
     delete pkt;
 }
 
-
 void replyArp(pcap_t* handle, uint8_t fromMac[6], uint8_t fromIp[4], uint8_t toMac[6], uint8_t toIp[4])
 {
     auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
     auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-
-
     auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
 }
 
-void queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
+std::string queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
 {
     struct bpf_program prog;
     auto filterString = toFilterString(myMac, otherIp);
@@ -95,6 +90,11 @@ void queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp
         throw std::runtime_error{"Failed to compile filter"};
     }
 
+    if(pcap_setfilter(handle, &prog) == -1)
+    {
+        throw std::runtime_error{"Failed to set filter"};
+    }
+
     requestArp(
         handle,
         myMac,
@@ -102,30 +102,20 @@ void queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp
         otherIp
     );
 
-    if(pcap_setfilter(handle, &prog) == -1)
-    {
-        throw std::runtime_error{"Failed to set filter"};
-    }
-
-    std::cout << Helper::toIpString(myIp) << std::endl;
 
     struct pcap_pkthdr* pktHdr;
     const u_char* pkt;
 
-    pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader));
     pcap_next_ex(handle, &pktHdr, &pkt);
     
-    auto packet = Packet::parse(pkt, pktHdr->caplen);
-
-    std::stringstream sstr;
-    packet->print(sstr);
-    std::cout << sstr.str() << std::endl;
-
+    auto arpPkt = dynamic_cast<ArpPacket*>(Packet::parse(pkt, pktHdr->caplen));
+    auto arpHdr = arpPkt->arpHeader();
+    return Helper::toMacString(arpHdr->smac);
 }
 
-void queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
+std::string queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
 {
-    queryMac(handle, myMac, reinterpret_cast<uint8_t*>(&myIp), reinterpret_cast<uint8_t*>(&otherIp));
+    return queryMac(handle, myMac, reinterpret_cast<uint8_t*>(&myIp), reinterpret_cast<uint8_t*>(&otherIp));
 }
 
 int main(int argc, char** argv) {
@@ -203,7 +193,9 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, senderAddress.sin_addr.s_addr);
+    auto senderMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, senderAddress.sin_addr.s_addr);
+    auto targetMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, targetAddress.sin_addr.s_addr);
+    std::cout << "senderMac " << senderMac << "targetMac" << targetMac << std::endl;
 
     /*replyArp(
         handle,
