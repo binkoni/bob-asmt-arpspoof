@@ -187,31 +187,6 @@ int main(int argc, char** argv) {
     struct sockaddr_in targetAddress;
     inet_pton(AF_INET, argv[3], &targetAddress.sin_addr);
     
-
-    /*
-    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    ethHdr->type = htons(ETHERTYPE_ARP);
-    memcpy(ethHdr->smac, myMacIfr.ifr_addr.sa_data, 6);
-    for(int i = 0; i < 6; ++i)
-        ethHdr->dmac[i] = 0xFF;
-
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
-    arpHdr->hwtype = htons(0x0001);
-    arpHdr->ptype = htons(0x0800);
-    arpHdr->hwlen = 6;
-    arpHdr->plen = 4;
-    arpHdr->opcode = htons(ARPOP_REQUEST);
-    memcpy(arpHdr->smac, myMacIfr.ifr_addr.sa_data, 6);
-    for(int i = 0; i < 6; ++i)
-        arpHdr->tmac[i] = 0x00;
-    *(uint32_t*)arpHdr->sip = myIp.s_addr;
-
-    arpHdr->tip[0] = 127;
-    arpHdr->tip[1] = 0;
-    arpHdr->tip[2] = 0;
-    arpHdr->tip[3] = 1;
-    */
     struct pcap_pkthdr* pktHdr;
     const u_char* pktRecv;
 
@@ -224,9 +199,6 @@ int main(int argc, char** argv) {
 
     auto senderMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, senderAddress.sin_addr.s_addr);
     auto targetMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, targetAddress.sin_addr.s_addr);
-
-    //senderAddress.sin_addr.s_addr = ntohl(senderAddress.sin_addr.s_addr);
-    //targetAddress.sin_addr.s_addr = ntohl(targetAddress.sin_addr.s_addr);
     
     while(true) {
         replyArp(
@@ -247,34 +219,5 @@ int main(int argc, char** argv) {
     delete senderMac;
     delete targetMac;
 
-
-    /*
-    struct bpf_program prog;
-
-    auto filterString = toFilterString(reinterpret_cast<uint8_t*>(myMac), myIp.s_addr);
-    std::cout << "Filterstring: " << filterString.c_str() << ")" << std::endl;
-
-    if(pcap_compile(handle, &prog, filterString.c_str(), 0, myIp.s_addr) == -1)
-    {
-        std::cout << "Failed to compile filter" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-    if(pcap_setfilter(handle, &prog) == -1)
-    {
-        std::cout << "Failed to set filter" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-    std::cout << Helper::toIpString(myIp.s_addr) << std::endl;
-
-    while(true)
-    {
-        //pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader));
-        pcap_next_ex(handle, &pktHdr, &pktRecv);
-        auto packet = Packet::parse(pktRecv, pktHdr->caplen);
-        std::stringstream sstr;
-        packet->print(sstr);
-        std::cout << sstr.str() << std::endl;
-    }
-    */
     pcap_close(handle);
 }
