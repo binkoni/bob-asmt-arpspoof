@@ -43,7 +43,6 @@ std::string toFilterString(uint8_t mac[6], uint8_t ip[4])
     return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Utils::toIpString(ip) % Utils::toMacString(mac));
 }
 
-
 uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
 {
     struct bpf_program prog;
@@ -112,6 +111,7 @@ int main(int argc, char** argv) {
 
     auto myIp = ((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr;
     auto myMac = myMacIfr.ifr_addr.sa_data;
+
 
     for(int i = 0; i < 6; ++i)
     {
