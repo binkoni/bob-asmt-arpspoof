@@ -24,6 +24,7 @@ public:
     ArpHeader* arpHeader() const;
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
+    void sendRequest();
 };
 
 #endif
