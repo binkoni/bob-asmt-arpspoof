@@ -66,7 +66,6 @@ uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t oth
         otherIp
     );
 
-
     struct pcap_pkthdr* pktHdr;
     const u_char* pkt;
 
@@ -88,19 +87,25 @@ int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
     if(argc < 4) {
          printHelp(argv[0], errbuf);
+         return EXIT_FAILURE;
     }
+
+    auto dev = argv[1];
+    auto senderIp = argv[2];
+    auto targetIp = argv[3];
 
     struct ifreq myMacIfr, myIpIfr;
     int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     strncpy(myMacIfr.ifr_name, argv[1], IFNAMSIZ - 1);
     strncpy(myIpIfr.ifr_name, argv[1], IFNAMSIZ - 1);
 
-    if(ioctl(sock, SIOCGIFHWADDR, &myMacIfr) != 0)
-    {
-        std::cout << "Failed to get MAC address" << std::endl;
-        close(sock);
-        std::exit(EXIT_FAILURE);
-    }
+    uint8_t myMac[6];
+    Utils::getMyMac(dev, myMac);
+    /*
+    uint8_t myIp[4];
+    Utils::getMyIp(dev, myIp);
+    */
+
     if(ioctl(sock, SIOCGIFADDR, &myIpIfr) != 0)
     {
         std::cout << "Failed to get IP address" << std::endl;
@@ -110,7 +115,6 @@ int main(int argc, char** argv) {
     close(sock);
 
     auto myIp = ((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr;
-    auto myMac = myMacIfr.ifr_addr.sa_data;
 
 
     for(int i = 0; i < 6; ++i)
@@ -130,9 +134,6 @@ int main(int argc, char** argv) {
     struct sockaddr_in targetAddress;
     inet_pton(AF_INET, argv[3], &targetAddress.sin_addr);
     
-    struct pcap_pkthdr* pktHdr;
-    const u_char* pktRecv;
-
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
     if(handle == NULL)
     {

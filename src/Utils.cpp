@@ -17,6 +17,7 @@ std::string Utils::toIpString(uint8_t ip[4])
     return boost::str(boost::format("%d.%d.%d.%d") % int(ip[0]) % int(ip[1]) % int(ip[2]) % int(ip[3]));
 }
 
+
 std::string Utils::toIpString(uint32_t ipInt)
 {
     auto ip = reinterpret_cast<uint8_t*>(&ipInt);
