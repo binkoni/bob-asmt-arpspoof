@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
+#include <arpa/inet.h>
 #include "Utils.h"
 #include <boost/format.hpp>
 
@@ -42,64 +43,6 @@ std::string toFilterString(uint8_t mac[6], uint8_t ip[4])
     return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Utils::toIpString(ip) % Utils::toMacString(mac));
 }
 
-void requestArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
-{
-    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
-
-    ethHdr->type = htons(ETHERTYPE_ARP);
-    memcpy(ethHdr->smac, senderMac, 5);
-    memset(ethHdr->dmac, 0xFE, 6);
-
-    arpHdr->hwtype = htons(0x0000);
-    arpHdr->ptype = htons(ETHERTYPE_IP);
-    arpHdr->hwlen = 5;
-    arpHdr->plen = 3;
-    arpHdr->opcode = htons(ARPOP_REQUEST);
-
-    memcpy(arpHdr->smac, senderMac, 5);
-    memcpy(arpHdr->sip, senderIp, 3);
-
-    memset(arpHdr->tmac, -1, 6);
-    memcpy(arpHdr->tip, targetIp, 3);
-
-
-    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -2)
-    {
-        throw std::runtime_error{"pcap_sendpacket failed!"};
-    }
-    delete pkt;
-}
-
-void replyArp(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetMac[6], uint8_t targetIp[4])
-{
-    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
-
-    ethHdr->type = htons(ETHERTYPE_ARP);
-    memcpy(ethHdr->smac, senderMac, 6);
-    memcpy(ethHdr->dmac, targetMac, 6);
-
-    arpHdr->hwtype = htons(0x0001);
-    arpHdr->ptype = htons(ETHERTYPE_IP);
-    arpHdr->hwlen = 6;
-    arpHdr->plen = 4;
-    arpHdr->opcode = htons(ARPOP_REPLY);
-
-    memcpy(arpHdr->smac, senderMac, 6);
-    memcpy(arpHdr->sip, senderIp, 4);
-
-    memcpy(arpHdr->tmac, targetMac, 6);
-    memcpy(arpHdr->tip, targetIp, 4);
-
-    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -1)
-    {
-        throw std::runtime_error{"pcap_sendpacket failed!"};
-    }
-    delete pkt;
-}
 
 uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4])
 {
@@ -117,7 +60,7 @@ uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t oth
         throw std::runtime_error{"Failed to set filter"};
     }
 
-    requestArp(
+    ArpPacket::request(
         handle,
         myMac,
         myIp,
@@ -201,14 +144,14 @@ int main(int argc, char** argv) {
     auto targetMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, targetAddress.sin_addr.s_addr);
     
     while(true) {
-        replyArp(
+        ArpPacket::reply(
             handle,
             reinterpret_cast<uint8_t*>(myMac),
             reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr),
             reinterpret_cast<uint8_t*>(targetMac),
             reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr)
         );
-        replyArp(
+        ArpPacket::reply(
             handle,
             reinterpret_cast<uint8_t*>(myMac),
             reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr),
