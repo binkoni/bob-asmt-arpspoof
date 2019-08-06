@@ -19,8 +19,10 @@
 #include "Utils.h"
 #include <boost/format.hpp>
 
-void printHelp(const char* argv0, char* errbuf)
+void printHelp(const char* argv0)
 {
+    char errbuf[PCAP_ERRBUF_SIZE];
+
     std::cout << "send_arp" << std::endl;
     std::cout << "Usage: " << argv0 << " <interface> <sender ip> <target ip>" << std::endl;
     std::cout << "Available Devices" << std::endl;
@@ -86,7 +88,7 @@ uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t othe
 int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
     if(argc < 4) {
-         printHelp(argv[0], errbuf);
+         printHelp(argv[0]);
          return EXIT_FAILURE;
     }
 
@@ -141,23 +143,23 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    auto senderMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, senderAddress.sin_addr.s_addr);
-    auto targetMac = queryMac(handle, reinterpret_cast<uint8_t*>(myMac), myIp.s_addr, targetAddress.sin_addr.s_addr);
+    auto senderMac = queryMac(handle, myMac, myIp.s_addr, senderAddress.sin_addr.s_addr);
+    auto targetMac = queryMac(handle, myMac, myIp.s_addr, targetAddress.sin_addr.s_addr);
     
     while(true) {
         ArpPacket::reply(
             handle,
-            reinterpret_cast<uint8_t*>(myMac),
-            reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr),
-            reinterpret_cast<uint8_t*>(targetMac),
-            reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr)
+            myMac,
+            Utils::fromIpSockAddr(senderAddress),
+            targetMac,
+            Utils::fromIpSockAddr(targetAddress)
         );
         ArpPacket::reply(
             handle,
-            reinterpret_cast<uint8_t*>(myMac),
-            reinterpret_cast<uint8_t*>(&targetAddress.sin_addr.s_addr),
-            reinterpret_cast<uint8_t*>(senderMac),
-            reinterpret_cast<uint8_t*>(&senderAddress.sin_addr.s_addr)
+            myMac,
+            Utils::fromIpSockAddr(targetAddress),
+            senderMac,
+            Utils::fromIpSockAddr(senderAddress)
         );
     }
     delete senderMac;
