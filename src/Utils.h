@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <string>
+#include <cstring>
 #include <boost/format.hpp>
 
 namespace Utils
@@ -30,9 +31,15 @@ namespace Utils
     {
         return reinterpret_cast<uint8_t*>(&ip);
     }
-    inline uint8_t* fromIpSockAddr(struct sockaddr_in& ip)
+    inline uint8_t* fromIpSockAddr(struct sockaddr& ip)
     {
-        return reinterpret_cast<uint8_t*>(&ip.sin_addr.s_addr);
+        return reinterpret_cast<uint8_t*>(reinterpret_cast<struct sockaddr_in*>(&ip)->sin_addr.s_addr);
+    }
+    inline void fromIpString(const char* ipString, uint8_t* ip)
+    {
+        struct sockaddr_in addr; 
+        inet_pton(AF_INET, ipString, &addr.sin_addr);
+        memcpy(ip, &addr.sin_addr, 4);
     }
 }
 

