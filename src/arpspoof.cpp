@@ -35,6 +35,7 @@ void printHelp(const char* argv0)
     std::exit(EXIT_FAILURE);
 }
 
+/*
 std::string toFilterString(uint8_t mac[6], uint32_t ip)
 {
     return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Utils::toIpString(ip) % Utils::toMacString(mac));
@@ -78,11 +79,6 @@ uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t oth
     auto newMac = new uint8_t[6];
     memcpy(newMac, arpHdr->smac, 6);
     return newMac;
-}
-/*
-uint8_t* queryMac(pcap_t* handle, uint8_t myMac[6], uint32_t myIp, uint32_t otherIp)
-{
-    return queryMac(handle, myMac, reinterpret_cast<uint8_t*>(&myIp), reinterpret_cast<uint8_t*>(&otherIp));
 }
 */
 
@@ -139,9 +135,11 @@ int main(int argc, char** argv) {
         std::cout << errbuf << std::endl;
         return -1;
     }
+    uint8_t senderMac[6];
+    uint8_t targetMac[6];
 
-    auto senderMac = queryMac(handle, myMac, Utils::fromIpSockAddr(myIp), senderIp);
-    auto targetMac = queryMac(handle, myMac, Utils::fromIpSockAddr(myIp), targetIp);
+    Utils::queryMac(handle, myMac, Utils::fromIpSockAddr(myIp), senderIp, senderMac);
+    Utils::queryMac(handle, myMac, Utils::fromIpSockAddr(myIp), targetIp, targetMac);
     
     while(true) {
         ArpPacket::reply(
@@ -159,8 +157,5 @@ int main(int argc, char** argv) {
             senderIp
         );
     }
-    delete senderMac;
-    delete targetMac;
-
     pcap_close(handle);
 }

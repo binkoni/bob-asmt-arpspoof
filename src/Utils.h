@@ -3,7 +3,9 @@
 
 #include <string>
 #include <cstring>
+#include <pcap.h>
 #include <boost/format.hpp>
+#include <stdint.h>
 
 namespace Utils
 {
@@ -41,6 +43,12 @@ namespace Utils
         inet_pton(AF_INET, ipString, &addr.sin_addr);
         memcpy(ip, &addr.sin_addr, 4);
     }
+    inline std::string toFilterString(uint8_t mac[6], uint8_t ip[4])
+    {
+        return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Utils::toIpString(ip) % Utils::toMacString(mac));
+    }
+
+    void queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4], uint8_t otherMac[6]);
 }
 
 #endif
