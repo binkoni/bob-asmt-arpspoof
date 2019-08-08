@@ -5,21 +5,18 @@
 #include "ArpPacket.h"
 #include "TcpPacket.h"
 
-Packet::Packet()
-{
-}
+Packet::Packet() {}
 
-Packet::Packet(const unsigned char* rawPacket, uint32_t rawPacketLen):
-    m_rawPacketLen{rawPacketLen},
-    m_rawPacket{const_cast<unsigned char*>(rawPacket)}
-//    m_rawPacket{new unsigned char[rawPacketLen]}
+Packet::Packet(const unsigned char* rawPacket, uint32_t rawPacketLen)
 {
-//    std::memcpy(m_rawPacket, rawPacket, rawPacketLen);
+    m_rawPacketLen = rawPacketLen;
+    m_rawPacket = new unsigned char[m_rawPacketLen];
+    std::memcpy(m_rawPacket, rawPacket, rawPacketLen);
 }
 
 Packet::~Packet()
 {
-    //delete m_rawPacket;
+    delete m_rawPacket;
 }
 
 Packet* Packet::parse(const unsigned char* rawPacket, uint32_t rawPacketLen)

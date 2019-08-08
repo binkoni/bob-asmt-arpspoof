@@ -20,7 +20,7 @@ struct TcpHeader {
 class TcpPacket: public IpPacket
 {
 public:
-    TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
     TcpHeader* tcpHeader() const;
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;

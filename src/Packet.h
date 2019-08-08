@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <sstream>
+#include <pcap.h>
 
 #define MY_NTOHS(n) ((uint16_t)((n & 0x00ff) << 8 | (n & 0xff00) >> 8))
 #define MY_NTOHL(n) ((uint16_t)((n & 0x000000ff) << 24 | (n & 0x0000ff00) << 8 | (n & 0x00ff0000) >> 8 | (n & 0xff000000) >> 24))
@@ -29,6 +30,7 @@ public:
     virtual std::string toString() const = 0;
     virtual void print(std::stringstream& sstr) const = 0;
     friend std::ostream& operator<<(std::ostream& ostr, const Packet& packet);
+    void send(pcap_t* handle);
 };
 
 #endif

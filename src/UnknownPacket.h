@@ -8,7 +8,7 @@
 class UnknownPacket: public Packet
 {
 public:
-    UnknownPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit UnknownPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
 };

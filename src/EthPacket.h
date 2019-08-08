@@ -15,7 +15,7 @@ struct EthHeader
 class EthPacket: public Packet
 {
 public:
-    EthPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit EthPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
     EthHeader* ethHeader() const;
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;

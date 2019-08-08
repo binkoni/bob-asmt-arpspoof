@@ -23,7 +23,8 @@ class ArpPacket: public EthPacket
 public:
     static void request(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4]);
     static void reply(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetMac[6], uint8_t targetIp[4]);
-    ArpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit ArpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit ArpPacket();
     ArpHeader* arpHeader() const;
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;

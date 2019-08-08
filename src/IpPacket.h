@@ -23,7 +23,7 @@ struct IpHeader
 class IpPacket: public EthPacket
 {
 public:
-    IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
     IpHeader* ipHeader() const;
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
