@@ -9,8 +9,8 @@
 
 namespace Utils
 {
-    void getMyMac(const char* dev, uint8_t myMac[6]);
-    void getMyIp(const char* dev, uint8_t myIp[4]);
+    void getMyMac(const char* iface, uint8_t myMac[6]);
+    void getMyIp(const char* iface, uint8_t myIp[4]);
 
     inline std::string toMacString(uint8_t mac[6])
     {

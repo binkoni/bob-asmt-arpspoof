@@ -8,10 +8,10 @@
 #include "Utils.h"
 #include "ArpPacket.h"
 
-void Utils::getMyMac(const char* dev, uint8_t myMac[6])
+void Utils::getMyMac(const char* iface, uint8_t myMac[6])
 {
     struct ifreq myMacIfr;
-    strncpy(myMacIfr.ifr_name, dev, IFNAMSIZ - 1);
+    strncpy(myMacIfr.ifr_name, iface, IFNAMSIZ - 1);
     auto sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     auto ret = ioctl(sock, SIOCGIFHWADDR, &myMacIfr);
     close(sock);
@@ -23,10 +23,10 @@ void Utils::getMyMac(const char* dev, uint8_t myMac[6])
 }
 
 
-void Utils::getMyIp(const char* dev, uint8_t myIp[4])
+void Utils::getMyIp(const char* iface, uint8_t myIp[4])
 {
     struct ifreq myIpIfr;
-    strncpy(myIpIfr.ifr_name, dev, IFNAMSIZ - 1);
+    strncpy(myIpIfr.ifr_name, iface, IFNAMSIZ - 1);
     auto sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     auto ret = ioctl(sock, SIOCGIFADDR, &myIpIfr);
     close(sock);
