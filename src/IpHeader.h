@@ -3,9 +3,9 @@
 
 #include <cstdint>
 #include <sstream>
-#include "EthPacket.h"
+#include "EthHeader.h"
 
-struct IpHeader
+struct IpHeaderStruct
 {
     unsigned char hlen:4;
     unsigned char ver:4;
@@ -20,14 +20,14 @@ struct IpHeader
     uint8_t dip[4];
 } __attribute__((packed));
 
-class IpPacket: public EthPacket
+class IpHeader: public EthHeader
 {
 public:
-    explicit IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    IpHeader* ipHeader() const;
+    explicit IpHeader();
+    IpHeaderStruct* headerStruct() const;
     uint8_t headerLength();
-    virtual void print(std::stringstream& sstr) const;
-    virtual std::string toString() const;
+    virtual void print(std::stringstream& sstr) const override;
+    virtual std::string toString() const override;
 };
 
 #endif

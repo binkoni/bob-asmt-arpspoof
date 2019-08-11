@@ -1,5 +1,5 @@
-#ifndef PACKET_H
-#define PACKET_H
+#ifndef HEADER_H
+#define HEADER_H
 
 #include <cstdint>
 #include <sstream>
@@ -16,22 +16,18 @@
 #define TCP_PAYLOAD(pkt) ((char*)((unsigned char*)TCP_HDR(pkt) + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt))) * 4))
 #define TCP_PAYLOAD_LEN(pkt) (MY_NTOHS(IP_HDR(pkt)->tlen) - (IP_HDR(pkt)->hlen + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt)))) * 4)
 
-class Packet
+class Header
 {
-protected:
-    uint32_t m_rawPacketLen;
-    unsigned char* m_rawPacket;
 public:
-    explicit Packet();
-    explicit Packet(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    explicit Packet(uint32_t rawPacketLen);
-    virtual ~Packet();
-    static Packet* parse(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    static Packet* parseIp(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit Header();
+    virtual ~Header();
+    static Header* parse(const unsigned char* rawHeader, uint32_t rawHeaderLen);
+    static Header* parseIp(const unsigned char* rawHeader, uint32_t rawHeaderLen);
     virtual std::string toString() const = 0;
     virtual void print(std::stringstream& sstr) const = 0;
-    friend std::ostream& operator<<(std::ostream& ostr, const Packet& packet);
-    void send(pcap_t* handle);
+    virtual void* headerStruct() const = 0;
+    friend std::ostream& operator<<(std::ostream& ostr, const Header& packet);
+    //void send(pcap_t* handle);
 };
 
 #endif

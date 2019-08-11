@@ -1,11 +1,11 @@
-#ifndef TCP_PACKET_H
-#define TCP_PACKET_H
+#ifndef TCP_HEADER_H
+#define TCP_HEADER_H
 
 #include <cstdint>
 #include <sstream>
-#include "IpPacket.h"
+#include "IpHeader.h"
 
-struct TcpHeader {
+struct TcpHeaderStruct {
     uint16_t sport;
     uint16_t dport;
     uint32_t seqNum;
@@ -17,11 +17,11 @@ struct TcpHeader {
     uint8_t options[8];
 } __attribute__((packed));
 
-class TcpPacket: public IpPacket
+class TcpHeader: public IpHeader
 {
 public:
-    explicit TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    TcpHeader* tcpHeader() const;
+    explicit TcpHeader(const unsigned char* rawHeader, uint32_t rawHeaderLen);
+    TcpHeaderStruct* tcpHeaderStruct() const;
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
 };

@@ -2,11 +2,11 @@
 #include <cstring>
 #include <cstdio>
 #include <iostream>
-#include "Packet.h"
-#include "EthPacket.h"
-#include "ArpPacket.h"
-#include "IpPacket.h"
-#include "TcpPacket.h"
+#include "Header.h"
+#include "EthHeader.h"
+#include "ArpHeader.h"
+#include "IpHeader.h"
+#include "TcpHeader.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -78,14 +78,14 @@ int main(int argc, char** argv) {
     Utils::queryMac(handle, myMac, myIp, targetIp, targetMac);
     
     while(true) {
-        ArpPacket::reply(
+        ArpHeader::reply(
             handle,
             myMac,
             senderIp,
             targetMac,
             targetIp 
         );
-        ArpPacket::reply(
+        ArpHeader::reply(
             handle,
             myMac,
             targetIp,
