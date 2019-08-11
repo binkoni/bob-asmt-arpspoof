@@ -7,6 +7,12 @@ TcpPacket::TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
     IpPacket{rawPacket, rawPacketLen}
 {
 }
+/*
+TcpPacket::TcpPacket():
+    IpPacket{sizeof(EthHeader) + IP_PACKET_MIN_LEN}
+{
+    
+}*/
 
 TcpHeader* TcpPacket::tcpHeader() const
 {

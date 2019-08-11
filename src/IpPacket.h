@@ -25,6 +25,7 @@ class IpPacket: public EthPacket
 public:
     explicit IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
     IpHeader* ipHeader() const;
+    uint8_t headerLength();
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
 };

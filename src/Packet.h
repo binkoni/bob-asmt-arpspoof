@@ -24,6 +24,7 @@ protected:
 public:
     explicit Packet();
     explicit Packet(const unsigned char* rawPacket, uint32_t rawPacketLen);
+    explicit Packet(uint32_t rawPacketLen);
     virtual ~Packet();
     static Packet* parse(const unsigned char* rawPacket, uint32_t rawPacketLen);
     static Packet* parseIp(const unsigned char* rawPacket, uint32_t rawPacketLen);

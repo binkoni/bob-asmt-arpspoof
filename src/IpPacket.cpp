@@ -13,6 +13,11 @@ IpHeader* IpPacket::ipHeader() const
     return reinterpret_cast<IpHeader*>(m_rawPacket + sizeof(EthHeader));
 }
 
+uint8_t IpPacket::headerLength()
+{
+    return ipHeader()->hlen;
+}
+
 void IpPacket::print(std::stringstream& sstr) const
 {
     EthPacket::print(sstr);

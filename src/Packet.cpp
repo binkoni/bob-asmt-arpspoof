@@ -10,8 +10,14 @@ Packet::Packet() {}
 Packet::Packet(const unsigned char* rawPacket, uint32_t rawPacketLen)
 {
     m_rawPacketLen = rawPacketLen;
-    m_rawPacket = new unsigned char[m_rawPacketLen];
+    m_rawPacket = static_cast<unsigned char*>(malloc(m_rawPacketLen));
     std::memcpy(m_rawPacket, rawPacket, rawPacketLen);
+}
+
+Packet::Packet(uint32_t rawPacketLen)
+{
+    m_rawPacketLen = rawPacketLen;
+    m_rawPacket = static_cast<unsigned char*>(calloc(m_rawPacketLen, sizeof(unsigned char)));
 }
 
 Packet::~Packet()
