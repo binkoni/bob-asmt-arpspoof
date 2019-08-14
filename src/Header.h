@@ -18,16 +18,22 @@
 
 class Header
 {
+protected:
+    uint32_t m_rawHeaderLen;
+    unsigned char* m_rawHeader;
 public:
     explicit Header();
+    Header(const unsigned char* rawHeader, uint32_t rawHeaderLen);
+    Header(uint32_t rawHeaderLen);
     virtual ~Header();
     static Header* parse(const unsigned char* rawHeader, uint32_t rawHeaderLen);
     static Header* parseIp(const unsigned char* rawHeader, uint32_t rawHeaderLen);
+    virtual void* headerStruct() const;
     virtual std::string toString() const = 0;
     virtual void print(std::stringstream& sstr) const = 0;
-    virtual void* headerStruct() const = 0;
     friend std::ostream& operator<<(std::ostream& ostr, const Header& packet);
     //void send(pcap_t* handle);
+    
 };
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <sstream>
-#include "IpHeader.h"
+#include "Header.h"
 
 struct TcpHeaderStruct {
     uint16_t sport;
@@ -17,11 +17,10 @@ struct TcpHeaderStruct {
     uint8_t options[8];
 } __attribute__((packed));
 
-class TcpHeader: public IpHeader
+class TcpHeader: public Header
 {
 public:
-    explicit TcpHeader(const unsigned char* rawHeader, uint32_t rawHeaderLen);
-    TcpHeaderStruct* tcpHeaderStruct() const;
+    explicit TcpHeader(const TcpHeaderStruct* headerStruct);
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
 };

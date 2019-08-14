@@ -1,32 +1,25 @@
 #include <iostream>
 #include <sstream>
-#include "TcpPacket.h"
-#include "IpPacket.h"
+#include "TcpHeader.h"
+#include "Header.h"
 
-TcpPacket::TcpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
-    IpPacket{rawPacket, rawPacketLen}
+TcpHeader::TcpHeader(const TcpHeaderStruct* headerStruct):
+    Header{reinterpret_cast<const unsigned char*>(headerStruct), sizeof(TcpHeaderStruct)}
 {
 }
 /*
-TcpPacket::TcpPacket():
-    IpPacket{sizeof(EthHeader) + IP_PACKET_MIN_LEN}
+TcpHeader::TcpHeader():
+    IpHeader{sizeof(EthHeader) + IP_HEADER_MIN_LEN}
 {
     
 }*/
 
-TcpHeader* TcpPacket::tcpHeader() const
+void TcpHeader::print(std::stringstream& sstr) const
 {
-    const auto ipHdr = ipHeader();
-    return reinterpret_cast<TcpHeader*>(reinterpret_cast<unsigned char*>(ipHdr) + ipHdr->hlen * 4);
+    sstr << TcpHeader::toString() << std::endl;
 }
 
-void TcpPacket::print(std::stringstream& sstr) const
+std::string TcpHeader::toString() const
 {
-    IpPacket::print(sstr);
-    sstr << TcpPacket::toString() << std::endl;
-}
-
-std::string TcpPacket::toString() const
-{
-    return "TcpPacket";
+    return "TcpHeader";
 }

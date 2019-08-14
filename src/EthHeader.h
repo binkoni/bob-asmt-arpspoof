@@ -15,8 +15,7 @@ struct EthHeaderStruct
 class EthHeader: public Header
 {
 public:
-    explicit EthHeader(EthHeaderStruct* hederStruct);
-    EthHeaderStruct* headerStruct() const;
+    explicit EthHeader(const EthHeaderStruct* headerStruct);
     virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
 };

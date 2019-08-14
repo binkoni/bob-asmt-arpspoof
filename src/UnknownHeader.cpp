@@ -1,20 +1,20 @@
 #include <iostream>
 #include <sstream>
 #include <boost/format.hpp>
-#include "UnknownPacket.h"
-#include "Packet.h"
+#include "UnknownHeader.h"
+#include "Header.h"
 
-UnknownPacket::UnknownPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
-    Packet{rawPacket, rawPacketLen}
+UnknownHeader::UnknownHeader():
+    Header{}
 {
 }
 
-void UnknownPacket::print(std::stringstream& sstr) const
+void UnknownHeader::print(std::stringstream& sstr) const
 {
-    sstr << UnknownPacket::toString();
+    sstr << UnknownHeader::toString();
 }
 
-std::string UnknownPacket::toString() const
+std::string UnknownHeader::toString() const
 {
     return "";
 }

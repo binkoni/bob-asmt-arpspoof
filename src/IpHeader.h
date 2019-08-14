@@ -1,9 +1,9 @@
-#ifndef IP_PACKET_H
-#define IP_PACKET_H
+#ifndef IP_HEADER_H
+#define IP_HEADER_H
 
 #include <cstdint>
 #include <sstream>
-#include "EthHeader.h"
+#include "Header.h"
 
 struct IpHeaderStruct
 {
@@ -20,12 +20,10 @@ struct IpHeaderStruct
     uint8_t dip[4];
 } __attribute__((packed));
 
-class IpHeader: public EthHeader
+class IpHeader: public Header
 {
 public:
-    explicit IpHeader();
-    IpHeaderStruct* headerStruct() const;
-    uint8_t headerLength();
+    explicit IpHeader(const IpHeaderStruct* headerStruct);
     virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
 };

@@ -5,29 +5,25 @@
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 #include <arpa/inet.h>
-#include "ArpPacket.h"
-#include "EthPacket.h"
+#include "ArpHeader.h"
+#include "EthHeader.h"
+#include "Header.h"
 
-ArpPacket::ArpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
-    EthPacket{rawPacket, rawPacketLen}
+ArpHeader::ArpHeader(const ArpHeaderStruct* headerStruct):
+    Header{reinterpret_cast<const unsigned char*>(headerStruct), sizeof(ArpHeaderStruct)}
 {
 }
 
-ArpHeader* ArpPacket::arpHeader() const
+
+void ArpHeader::print(std::stringstream& sstr) const
 {
-    return reinterpret_cast<ArpHeader*>(m_rawPacket + sizeof(EthHeader));
+    sstr << ArpHeader::toString() << std::endl;
 }
 
-void ArpPacket::print(std::stringstream& sstr) const
-{
-    EthPacket::print(sstr);
-    sstr << ArpPacket::toString() << std::endl;
-}
-
-std::string ArpPacket::toString() const
+std::string ArpHeader::toString() const
 {
     std::stringstream sstr;
-    auto hdr = arpHeader();
+    auto hdr = reinterpret_cast<ArpHeaderStruct*>(headerStruct());
     sstr << boost::format("arp hwtype 0x%02X\n") % int(MY_NTOHS(hdr->hwtype));
     sstr << boost::format("arp ptype 0x%02X\n") % int(MY_NTOHS(hdr->ptype));
     sstr << boost::format("arp hwlen 0x%01X\n") % int(hdr->hwlen);
@@ -41,11 +37,11 @@ std::string ArpPacket::toString() const
     return sstr.str();
 }
 
-void ArpPacket::request(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
+void ArpHeader::request(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
 {
-    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
+    auto pkt = new unsigned char[sizeof(EthHeaderStruct) + sizeof(ArpHeaderStruct)];
+    auto ethHdr = reinterpret_cast<EthHeaderStruct*>(pkt);
+    auto arpHdr = reinterpret_cast<ArpHeaderStruct*>(ARP_HDR(pkt));
 
     ethHdr->type = htons(ETHERTYPE_ARP);
     memcpy(ethHdr->smac, senderMac, 5);
@@ -64,18 +60,18 @@ void ArpPacket::request(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4
     memcpy(arpHdr->tip, targetIp, 3);
 
 
-    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -2)
+    if(pcap_sendpacket(handle, pkt, sizeof(EthHeaderStruct) + sizeof(ArpHeaderStruct)) == -2)
     {
         throw std::runtime_error{"pcap_sendpacket failed!"};
     }
     delete pkt;
 }
 
-void ArpPacket::reply(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetMac[6], uint8_t targetIp[4])
+void ArpHeader::reply(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetMac[6], uint8_t targetIp[4])
 {
-    auto pkt = new unsigned char[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
+    auto pkt = new unsigned char[sizeof(EthHeaderStruct) + sizeof(ArpHeaderStruct)];
+    auto ethHdr = reinterpret_cast<EthHeaderStruct*>(pkt);
+    auto arpHdr = reinterpret_cast<ArpHeaderStruct*>(ARP_HDR(pkt));
 
     ethHdr->type = htons(ETHERTYPE_ARP);
     memcpy(ethHdr->smac, senderMac, 6);
@@ -93,7 +89,7 @@ void ArpPacket::reply(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4],
     memcpy(arpHdr->tmac, targetMac, 6);
     memcpy(arpHdr->tip, targetIp, 4);
 
-    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -1)
+    if(pcap_sendpacket(handle, pkt, sizeof(EthHeaderStruct) + sizeof(ArpHeaderStruct)) == -1)
     {
         throw std::runtime_error{"pcap_sendpacket failed!"};
     }

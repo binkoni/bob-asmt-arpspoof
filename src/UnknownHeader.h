@@ -1,16 +1,16 @@
-#ifndef UNKNOWN_PACKET_H
-#define UNKNOWN_PACKET_H
+#ifndef UNKNOWN_HEADER_H
+#define UNKNOWN_HEADER_H
 
 #include <cstdint>
 #include <sstream>
-#include "Packet.h"
+#include "Header.h"
 
-class UnknownPacket: public Packet
+class UnknownHeader: public Header
 {
 public:
-    explicit UnknownPacket(const unsigned char* rawPacket, uint32_t rawPacketLen);
-    virtual void print(std::stringstream& sstr) const;
-    virtual std::string toString() const;
+    explicit UnknownHeader();
+    virtual void print(std::stringstream& sstr) const override;
+    virtual std::string toString() const override;
 };
 
 #endif

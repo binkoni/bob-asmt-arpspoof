@@ -1,30 +1,20 @@
 #include <iostream>
 #include <sstream>
-#include "IpPacket.h"
-#include "EthPacket.h"
+#include "IpHeader.h"
+#include "Header.h"
 
-IpPacket::IpPacket(const unsigned char* rawPacket, uint32_t rawPacketLen):
-    EthPacket{rawPacket, rawPacketLen}
+IpHeader::IpHeader(const IpHeaderStruct* headerStruct):
+    Header{reinterpret_cast<const unsigned char*>(headerStruct), sizeof(IpHeaderStruct)}
 {
 }
 
-IpHeader* IpPacket::ipHeader() const
+void IpHeader::print(std::stringstream& sstr) const
 {
-    return reinterpret_cast<IpHeader*>(m_rawPacket + sizeof(EthHeader));
+    IpHeader::print(sstr);
+    sstr << IpHeader::toString() << std::endl;
 }
 
-uint8_t IpPacket::headerLength()
+std::string IpHeader::toString() const
 {
-    return ipHeader()->hlen;
-}
-
-void IpPacket::print(std::stringstream& sstr) const
-{
-    EthPacket::print(sstr);
-    sstr << IpPacket::toString() << std::endl;
-}
-
-std::string IpPacket::toString() const
-{
-    return "IpPacket";
+    return "IpHeader";
 }
