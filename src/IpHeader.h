@@ -24,6 +24,7 @@ class IpHeader: public Header
 {
 public:
     explicit IpHeader(const IpHeaderStruct* headerStruct);
+    explicit IpHeader();
     virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
 };

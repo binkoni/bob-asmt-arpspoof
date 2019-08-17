@@ -7,12 +7,11 @@ TcpHeader::TcpHeader(const TcpHeaderStruct* headerStruct):
     Header{reinterpret_cast<const unsigned char*>(headerStruct), sizeof(TcpHeaderStruct)}
 {
 }
-/*
+
 TcpHeader::TcpHeader():
-    IpHeader{sizeof(EthHeader) + IP_HEADER_MIN_LEN}
+    Header{sizeof(TcpHeaderStruct)}
 {
-    
-}*/
+}
 
 void TcpHeader::print(std::stringstream& sstr) const
 {

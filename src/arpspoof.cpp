@@ -17,6 +17,7 @@
 #include <net/if_arp.h>
 #include <arpa/inet.h>
 #include "Utils.h"
+#include "Packet.h"
 #include <boost/format.hpp>
 
 void printHelp(const char* argv0)
@@ -35,6 +36,7 @@ void printHelp(const char* argv0)
     std::exit(EXIT_FAILURE);
 }
 
+/*
 int main(int argc, char** argv) {
     char errbuf[PCAP_ERRBUF_SIZE];
     if(argc < 4) {
@@ -94,4 +96,50 @@ int main(int argc, char** argv) {
         );
     }
     pcap_close(handle);
+}
+*/
+
+
+int main(int argc, char* argv[])
+{
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
+    if(handle == NULL)
+    {
+        std::cout << errbuf << std::endl;
+        return -1;
+    }
+
+    EthHeader ethHeader{};
+    auto ethHeaderStruct = static_cast<EthHeaderStruct*>(ethHeader.headerStruct());
+    ethHeaderStruct->smac[0] = 0x00;
+    ethHeaderStruct->smac[1] = 0x00;
+    ethHeaderStruct->smac[2] = 0x00;
+    ethHeaderStruct->smac[3] = 0x00;
+    ethHeaderStruct->smac[4] = 0x00;
+    ethHeaderStruct->smac[5] = 0x00;
+
+    ethHeaderStruct->dmac[0] = 0x00;
+    ethHeaderStruct->dmac[1] = 0x01;
+    ethHeaderStruct->dmac[2] = 0x02;
+    ethHeaderStruct->dmac[3] = 0x03;
+    ethHeaderStruct->dmac[4] = 0x04;
+    ethHeaderStruct->dmac[5] = 0x05;
+    ethHeaderStruct->ethtype = ETHERTYPE_LOOPBACK;
+
+    ArpHeader arpHeader{};
+    auto arpHeaderStruct = static_cast<ArpHeaderStruct*>(arpHeader.headerStruct());
+
+    Packet packet;
+
+    packet += &ethHeader;
+
+    packet.send(handle);
+    /*
+    if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header), 10) == -2)
+        return -1;
+    if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthHeaderStruct) - 10) == -2)
+        return -1;
+    */
+
 }

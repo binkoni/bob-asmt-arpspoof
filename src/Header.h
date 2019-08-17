@@ -10,10 +10,12 @@
 
 #define IP_HDR(pkt) ((struct IpHeader*)((unsigned char*)pkt + sizeof(struct EthHeader)))
 #define ARP_HDR(pkt) ((struct ArpHeader*)((unsigned char*)pkt + sizeof(struct EthHeader)))
+
 #define TCP_HDR_HLEN(hdr) ((MY_NTOHS((hdr)->hlenWithFlags) & 0b1111000000000000) >> 4)
 #define TCP_HDR_FLAGS(hdr) (MY_NTOHS((hdr)->hlenWithFlags) & 0b0000111111111111)
 #define TCP_HDR(pkt) ((struct TcpHeader*)((unsigned char*)IP_HDR(pkt) + IpHeader->hlen * 4))
 #define TCP_PAYLOAD(pkt) ((char*)((unsigned char*)TCP_HDR(pkt) + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt))) * 4))
+
 #define TCP_PAYLOAD_LEN(pkt) (MY_NTOHS(IP_HDR(pkt)->tlen) - (IP_HDR(pkt)->hlen + MY_NTOHS(TCP_HDR_HLEN(TCP_HDR(pkt)))) * 4)
 
 class Header
@@ -29,6 +31,7 @@ public:
     static Header* parse(const unsigned char* rawHeader, uint32_t rawHeaderLen);
     static Header* parseIp(const unsigned char* rawHeader, uint32_t rawHeaderLen);
     virtual void* headerStruct() const;
+    virtual size_t headerStructSize() const;
     virtual std::string toString() const = 0;
     virtual void print(std::stringstream& sstr) const = 0;
     friend std::ostream& operator<<(std::ostream& ostr, const Header& packet);

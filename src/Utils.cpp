@@ -66,5 +66,5 @@ void Utils::queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t 
     
     auto arpPkt = dynamic_cast<ArpHeader*>(Header::parse(pkt, pktHdr->caplen));
     auto arpHdr = reinterpret_cast<ArpHeaderStruct*>(arpPkt->headerStruct());
-    memcpy(otherMac, arpHdr->smac, 6);
+    memcpy(otherMac, arpHdr->sha, 6);
 }

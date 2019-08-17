@@ -16,7 +16,6 @@ Header::Header(const unsigned char* rawHeader, uint32_t rawHeaderLen)
     std::memcpy(m_rawHeader, rawHeader, rawHeaderLen);
 }
 
-
 Header::Header(uint32_t rawHeaderLen)
 {
     m_rawHeaderLen = rawHeaderLen;
@@ -33,17 +32,22 @@ void* Header::headerStruct() const
     return m_rawHeader;
 }
 
+size_t Header::headerStructSize() const
+{
+    return m_rawHeaderLen;
+}
+
 
 Header* Header::parse(const unsigned char* rawHeader, uint32_t rawHeaderLen)
 {
     auto header = reinterpret_cast<const EthHeaderStruct*>(rawHeader);
-    switch(MY_NTOHS(header->type))
+    switch(MY_NTOHS(header->ethtype))
     {
         case 0x0800:
             //return new UnknownHeader{rawHeader, rawHeaderLen};
             return parseIp(rawHeader, rawHeaderLen);
         case 0x0806:
-            return new ArpHeader{reinterpret_cast<const ArpHeaderStruct*>(rawHeader)};
+            return new ArpHeader{reinterpret_cast<const ArpHeaderStruct*>(rawHeader + sizeof(EthHeaderStruct))};
         default:
             return new UnknownHeader{};
     }
@@ -55,7 +59,7 @@ Header* Header::parseIp(const unsigned char* rawHeader, uint32_t rawHeaderLen)
     auto header = reinterpret_cast<const IpHeaderStruct*>(IP_HDR(rawHeader));
     if(header->proto == 0x06)
     {
-        return new TcpHeader{reinterpret_cast<const TcpHeaderStruct*>(rawHeader)};
+        return new TcpHeader{reinterpret_cast<const TcpHeaderStruct*>(rawHeader + sizeof(EthHeaderStruct) + header->hlen * 4)};
     }
     return new UnknownHeader{};
 }

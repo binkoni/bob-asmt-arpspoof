@@ -8,6 +8,11 @@ IpHeader::IpHeader(const IpHeaderStruct* headerStruct):
 {
 }
 
+IpHeader::IpHeader():
+    Header{sizeof(IpHeaderStruct)}
+{
+}
+
 void IpHeader::print(std::stringstream& sstr) const
 {
     IpHeader::print(sstr);
