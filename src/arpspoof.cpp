@@ -2,11 +2,11 @@
 #include <cstring>
 #include <cstdio>
 #include <iostream>
-#include "Header.h"
-#include "EthHeader.h"
-#include "ArpHeader.h"
-#include "IpHeader.h"
-#include "TcpHeader.h"
+#include "Pdu.h"
+#include "EthPdu.h"
+#include "ArpPdu.h"
+#include "Ip4Pdu.h"
+#include "TcpPdu.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -79,14 +79,14 @@ int main(int argc, char** argv) {
     Utils::queryMac(handle, myMac, myIp, targetIp, targetMac);
     
     while(true) {
-        ArpHeader::reply(
+        ArpPdu::reply(
             handle,
             myMac,
             senderIp,
             targetMac,
             targetIp 
         );
-        ArpHeader::reply(
+        ArpPdu::reply(
             handle,
             myMac,
             targetIp,
@@ -119,34 +119,34 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    EthHeader ethHeader{};
-    auto ethHeaderStruct = static_cast<EthHeaderStruct*>(ethHeader.headerStruct());
-    ethHeaderStruct->smac[0] = 0x00;
-    ethHeaderStruct->smac[1] = 0x00;
-    ethHeaderStruct->smac[2] = 0x00;
-    ethHeaderStruct->smac[3] = 0x00;
-    ethHeaderStruct->smac[4] = 0x00;
-    ethHeaderStruct->smac[5] = 0x00;
+    EthPdu ethPdu{};
+    auto ethPduStruct = static_cast<EthPduStruct*>(ethPdu.headerStruct());
+    ethPduStruct->smac[0] = 0x00;
+    ethPduStruct->smac[1] = 0x00;
+    ethPduStruct->smac[2] = 0x00;
+    ethPduStruct->smac[3] = 0x00;
+    ethPduStruct->smac[4] = 0x00;
+    ethPduStruct->smac[5] = 0x00;
 
-    ethHeaderStruct->dmac[0] = 0x00;
-    ethHeaderStruct->dmac[1] = 0x01;
-    ethHeaderStruct->dmac[2] = 0x02;
-    ethHeaderStruct->dmac[3] = 0x03;
-    ethHeaderStruct->dmac[4] = 0x04;
-    ethHeaderStruct->dmac[5] = 0x05;
-    ethHeaderStruct->ethtype = ETHERTYPE_LOOPBACK;
+    ethPduStruct->dmac[0] = 0x00;
+    ethPduStruct->dmac[1] = 0x01;
+    ethPduStruct->dmac[2] = 0x02;
+    ethPduStruct->dmac[3] = 0x03;
+    ethPduStruct->dmac[4] = 0x04;
+    ethPduStruct->dmac[5] = 0x05;
+    ethPduStruct->ethtype = ETHERTYPE_LOOPBACK;
 
-    ArpHeader arpHeader{};
-    auto arpHeaderStruct = static_cast<ArpHeaderStruct*>(arpHeader.headerStruct());
+    ArpPdu arpPdu{};
+    auto arpPduStruct = static_cast<ArpPduStruct*>(arpPdu.headerStruct());
 
     Packet packet;
 
-    packet += &ethHeader;
+    packet += &ethPdu;
 
     packet.send(handle);
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header), 10) == -2)
         return -1;
-    if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthHeaderStruct) - 10) == -2)
+    if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthPduStruct) - 10) == -2)
         return -1;
     */
 }

@@ -4,12 +4,17 @@
 #include "Pdu.h"
 
 TcpPdu::TcpPdu(const TcpHeader& header):
-    Pdu{reinterpret_cast<const unsigned char*>(&header), sizeof(TcpHeader)}
+    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(TcpHeader)}
+{
+}
+
+TcpPdu::TcpPdu(const TcpHeader* header):
+    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(TcpHeader)}
 {
 }
 
 TcpPdu::TcpPdu():
-    Header{sizeof(TcpHeader)}
+    Pdu{sizeof(TcpHeader)}
 {
 }
 

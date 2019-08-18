@@ -4,6 +4,8 @@
 #include <array>
 #include <cstdint>
 #include <sstream>
+
+#include "MacAddr.h"
 #include "Pdu.h"
 
 struct EthHeader
@@ -16,8 +18,9 @@ struct EthHeader
 class EthPdu: public Pdu
 {
 public:
-    explicit EthPdu(const EthHeader& header);
     explicit EthPdu();
+    explicit EthPdu(const EthHeader& header);
+    explicit EthPdu(const EthHeader* header);
 
     MacAddr dmac();
     MacAddr smac();

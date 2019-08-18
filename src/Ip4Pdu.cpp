@@ -4,11 +4,11 @@
 #include "Pdu.h"
 
 Ip4Pdu::Ip4Pdu(const Ip4Header& header):
-    Pdu{reinterpret_cast<const unsigned char*>(&header), sizeof(Ip4Header)}
+    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(Ip4Header)}
 {}
 
-Ip4Pdu::Ip4Pdu(Ip4Header&& header):
-    Pdu{reinterpret_cast<const unsigned char*>(&header), sizeof(Ip4Header)}
+Ip4Pdu::Ip4Pdu(const Ip4Header* header):
+    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(Ip4Header)}
 {}
 
 Ip4Pdu::Ip4Pdu():

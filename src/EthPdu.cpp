@@ -4,10 +4,15 @@
 #include <iostream>
 #include <sstream>
 #include "EthPdu.h"
+#include "MacAddr.h"
 #include "Pdu.h"
 
 EthPdu::EthPdu(const EthHeader& header):
-    Pdu{reinterpret_cast<const unsigned char*>(&header), sizeof(EthHeader)}
+    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(EthHeader)}
+{}
+
+EthPdu::EthPdu(const EthHeader* header):
+    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(EthHeader)}
 {}
 
 EthPdu::EthPdu():
@@ -35,13 +40,13 @@ uint16_t EthPdu::ethtype()
 void EthPdu::dmac(const MacAddr& dmac)
 {
     auto header = static_cast<EthHeader* const>(EthPdu::header());
-    std::copy(std::begin(dmac), std::end(dmac), header->dmac);
+    std::copy(dmac.cbegin(), dmac.cend(), header->dmac);
 }
 
 void EthPdu::smac(const MacAddr& smac)
 {
     auto header = static_cast<EthHeader* const>(EthPdu::header());
-    std::copy(std::begin(smac), std::end(smac), header->smac);
+    std::copy(smac.cbegin(), smac.cend(), header->smac);
 }
 
 void EthPdu::ethtype(uint16_t ethtype)

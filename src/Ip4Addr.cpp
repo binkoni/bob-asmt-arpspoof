@@ -51,3 +51,23 @@ Ip4Addr::Ip4Addr(std::array<uint8_t, IP4_ADDR_SIZE> arr)
 {
     m_addr = arr;
 }
+
+std::array<uint8_t, IP4_ADDR_SIZE>::iterator begin()
+{
+    return m_addr.begin();
+}
+
+std::array<uint8_t, IP4_ADDR_SIZE>::const_iterator cbegin()
+{
+    return m_addr.cbegin();
+}
+
+std::array<uint8_t, IP4_ADDR_SIZE>::iterator end()
+{
+    return m_addr.end();
+}
+
+std::array<uint8_t, IP4_ADDR_SIZE>::const_iterator cend()
+{
+    return m_addr.cend();
+}

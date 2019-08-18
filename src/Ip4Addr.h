@@ -15,9 +15,9 @@ public:
     Ip4Addr(std::array<uint8_t, IP4_ADDR_SIZE> arr);
 
     std::array<uint8_t, IP4_ADDR_SIZE>::iterator begin();
-    std::array<uint8_t, IP4_ADDR_SIZE>::const_iterator cbegin();
+    std::array<uint8_t, IP4_ADDR_SIZE>::const_iterator cbegin() const;
     std::array<uint8_t, IP4_ADDR_SIZE>::iterator end();
-    std::array<uint8_t, IP4_ADDR_SIZE>::const_iterator cend();
+    std::array<uint8_t, IP4_ADDR_SIZE>::const_iterator cend() const;
 };
 
 #endif

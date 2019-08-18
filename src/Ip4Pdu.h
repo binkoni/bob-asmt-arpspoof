@@ -24,6 +24,7 @@ class Ip4Pdu: public Pdu
 {
 public:
     explicit Ip4Pdu(const Ip4Header& header);
+    explicit Ip4Pdu(const Ip4Header* header);
     explicit Ip4Pdu();
     /*
     virtual void print(std::stringstream& sstr) const override;

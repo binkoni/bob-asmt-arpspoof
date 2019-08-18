@@ -5,6 +5,9 @@
 #include <cstdint>
 #include <sstream>
 #include <pcap.h>
+
+#include "Ip4Addr.h"
+#include "MacAddr.h"
 #include "Pdu.h"
 
 struct ArpHeader {
@@ -22,10 +25,11 @@ struct ArpHeader {
 class ArpPdu: public Pdu
 {
 public:
-    static void request(pcap_t* handle, const MacAddr& senderMac, const IpAddr& senderIp, const IpAddr& targetIp);
-    static void reply(pcap_t* handle, const MacAddr& senderMac, const IpAddr& senderIp, const MacAddr& targetMac, const IpAddr& targetIp);
+    static void request(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& senderIp, const Ip4Addr& targetIp);
+    static void reply(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& senderIp, const MacAddr& targetMac, const Ip4Addr& targetIp);
 
     explicit ArpPdu(const ArpHeader& header);
+    explicit ArpPdu(const ArpHeader* header);
     explicit ArpPdu();
 
     uint16_t htype();
@@ -37,7 +41,7 @@ public:
     MacAddr sha();
     Ip4Addr spa();
     MacAddr tha();
-    IpAddr tpa();
+    Ip4Addr tpa();
 
     void htype(uint16_t);
     void ptype(uint16_t);
