@@ -27,6 +27,16 @@ public:
     explicit ArpHeader(const ArpHeaderStruct* headerStruct);
     explicit ArpHeader();
 
+    uint16_t htype();
+    uint16_t ptype();
+    uint8_t hlen();
+    uint8_t plen();
+    uint16_t opcode();
+    std::array<uint8_t, 6> sha();
+    std::array<uint8_t, 4> spa();
+    std::array<uint8_t, 6> tha();
+    std::array<uint8_t, 4> tpa();
+
     void htype(uint16_t);
     void ptype(uint16_t);
     void hlen(uint8_t);

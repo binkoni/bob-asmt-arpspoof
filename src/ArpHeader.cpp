@@ -12,12 +12,73 @@
 
 ArpHeader::ArpHeader(const ArpHeaderStruct* headerStruct):
     Header{reinterpret_cast<const unsigned char*>(headerStruct), sizeof(ArpHeaderStruct)}
-{
-}
+{}
 
 ArpHeader::ArpHeader():
     Header{sizeof(ArpHeaderStruct)}
 {}
+
+uint16_t ArpHeader::htype()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    return headerStruct->htype;
+}
+
+uint16_t ArpHeader::ptype()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    return headerStruct->ptype;
+}
+
+uint8_t ArpHeader::hlen()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    return headerStruct->hlen;
+}
+
+uint8_t ArpHeader::plen()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    return headerStruct->plen;
+}
+
+uint16_t ArpHeader::opcode()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    return headerStruct->opcode;
+}
+
+std::array<uint8_t, 6> ArpHeader::sha()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    std::array<uint8_t, 6> sha;
+    std::copy(headerStruct->sha, headerStruct->sha + 6, std::begin(sha));
+    return sha;
+}
+
+std::array<uint8_t, 4> ArpHeader::spa()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    std::array<uint8_t, 4> spa;
+    std::copy(headerStruct->spa, headerStruct->spa + 4, std::begin(spa));
+    return spa;
+}
+
+std::array<uint8_t, 6> ArpHeader::tha()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    std::array<uint8_t, 6> tha;
+    std::copy(headerStruct->sha, headerStruct->sha + 6, std::begin(tha));
+    return tha;
+}
+
+std::array<uint8_t, 4> ArpHeader::tpa()
+{
+    auto headerStruct = reinterpret_cast<ArpHeaderStruct*>(ArpHeader::headerStruct());
+    std::array<uint8_t, 4> tpa;
+    std::copy(headerStruct->tpa, headerStruct->tpa + 6, std::begin(tpa));
+    return tpa;
+}
 
 void ArpHeader::htype(uint16_t htype)
 {
