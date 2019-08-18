@@ -1,11 +1,11 @@
-#ifndef IP_HEADER_H
-#define IP_HEADER_H
+#ifndef IP4_PDU_H
+#define IP4_PDU_H
 
 #include <cstdint>
 #include <sstream>
-#include "Header.h"
+#include "Pdu.h"
 
-struct IpHeaderStruct
+struct Ip4Header
 {
     unsigned char hlen:4;
     unsigned char ver:4;
@@ -20,13 +20,15 @@ struct IpHeaderStruct
     uint8_t dip[4];
 } __attribute__((packed));
 
-class IpHeader: public Header
+class Ip4Pdu: public Pdu
 {
 public:
-    explicit IpHeader(const IpHeaderStruct* headerStruct);
-    explicit IpHeader();
+    explicit Ip4Pdu(const Ip4Header& header);
+    explicit Ip4Pdu();
+    /*
     virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
+    */
 };
 
 #endif

@@ -1,16 +1,18 @@
-#ifndef UNKNOWN_HEADER_H
-#define UNKNOWN_HEADER_H
+#ifndef RAW_PDU_H
+#define RAW_PDU_H
 
 #include <cstdint>
 #include <sstream>
-#include "Header.h"
+#include "Pdu.h"
 
-class UnknownHeader: public Header
+class RawPdu: public Pdu
 {
 public:
-    explicit UnknownHeader();
+    explicit RawPdu();
+/*
     virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
+*/
 };
 
 #endif

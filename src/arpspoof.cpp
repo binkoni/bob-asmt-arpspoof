@@ -33,7 +33,6 @@ void printHelp(const char* argv0)
       for(pcap_if_t* curdevp = alldevsp; curdevp->next != NULL; curdevp = curdevp->next)
         std::cout << "  " << curdevp->name << std::endl;
     }
-    std::exit(EXIT_FAILURE);
 }
 
 /*
@@ -99,9 +98,19 @@ int main(int argc, char** argv) {
 }
 */
 
-
 int main(int argc, char* argv[])
 {
+    if(argc < 4 || argc % 2 != 0)
+    {
+        printHelp(argv[0]);
+        std::exit(EXIT_FAILURE);
+    }
+    for(int i = 1; i < argc; i += 2)
+    {
+        printf("%s\n", argv[i]);
+        printf("%s\n", argv[i + 1]);
+    }
+    /*
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
     if(handle == NULL)
@@ -135,11 +144,9 @@ int main(int argc, char* argv[])
     packet += &ethHeader;
 
     packet.send(handle);
-    /*
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header), 10) == -2)
         return -1;
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthHeaderStruct) - 10) == -2)
         return -1;
     */
-
 }

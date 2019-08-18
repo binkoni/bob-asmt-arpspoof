@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <sstream>
 #include <pcap.h>
-#include "Header.h"
+#include "Pdu.h"
 
-struct ArpHeaderStruct {
+struct ArpHeader {
     uint16_t htype;
     uint16_t ptype;
     uint8_t hlen;
@@ -19,36 +19,41 @@ struct ArpHeaderStruct {
     uint8_t tpa[4];
 } __attribute__((packed));
 
-class ArpHeader: public Header
+class ArpPdu: public Pdu
 {
 public:
-    static void request(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4]);
-    static void reply(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetMac[6], uint8_t targetIp[4]);
-    explicit ArpHeader(const ArpHeaderStruct* headerStruct);
-    explicit ArpHeader();
+    static void request(pcap_t* handle, const MacAddr& senderMac, const IpAddr& senderIp, const IpAddr& targetIp);
+    static void reply(pcap_t* handle, const MacAddr& senderMac, const IpAddr& senderIp, const MacAddr& targetMac, const IpAddr& targetIp);
+
+    explicit ArpPdu(const ArpHeader& header);
+    explicit ArpPdu();
 
     uint16_t htype();
     uint16_t ptype();
     uint8_t hlen();
     uint8_t plen();
     uint16_t opcode();
-    std::array<uint8_t, 6> sha();
-    std::array<uint8_t, 4> spa();
-    std::array<uint8_t, 6> tha();
-    std::array<uint8_t, 4> tpa();
+
+    MacAddr sha();
+    Ip4Addr spa();
+    MacAddr tha();
+    IpAddr tpa();
 
     void htype(uint16_t);
     void ptype(uint16_t);
     void hlen(uint8_t);
     void plen(uint8_t);
     void opcode(uint16_t);
-    void sha(std::array<uint8_t, 6>);
-    void spa(std::array<uint8_t, 4>);
-    void tha(std::array<uint8_t, 6>);
-    void tpa(std::array<uint8_t, 4>);
 
+    void sha(const MacAddr&);
+    void spa(const Ip4Addr&);
+    void tha(const MacAddr&);
+    void tpa(const Ip4Addr&);
+
+    /*
     virtual std::string toString() const override;
     virtual void print(std::stringstream& sstr) const override;
+    */
     //void send(pcap_t* handle);
 };
 

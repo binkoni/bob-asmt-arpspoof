@@ -1,12 +1,12 @@
-#ifndef TCP_HEADER_H
-#define TCP_HEADER_H
+#ifndef TCP_PDU_H
+#define TCP_PDU_H
 
 #include <cstdint>
 #include <sstream>
 #include <arpa/inet.h>
-#include "Header.h"
+#include "Pdu.h"
 
-struct TcpHeaderStruct {
+struct TcpHeader {
     uint16_t sport;
     uint16_t dport;
     uint32_t seqNum;
@@ -18,15 +18,17 @@ struct TcpHeaderStruct {
     uint8_t options[8];
 } __attribute__((packed));
 
-class TcpHeader: public Header
+class TcpPdu: public Pdu
 {
 public:
-    explicit TcpHeader(const TcpHeaderStruct* headerStruct);
-    explicit TcpHeader();
+    explicit TcpPdu(const TcpHeader& header);
+    explicit TcpPdu();
+    #define TCP_PDU_HLEN(header) ((ntohs((header)->hlenWithFlags) & 0b1111000000000000) >> 4)
+    #define TCP_PDU_FLAGS(header) (ntohs((header)->hlenWithFlags) & 0b0000111111111111)
+    /*
     virtual void print(std::stringstream& sstr) const;
     virtual std::string toString() const;
-    #define TCP_HEADER_HLEN(header) ((ntohs((header)->hlenWithFlags) & 0b1111000000000000) >> 4)
-    #define TCP_HEADER_FLAGS(header) (ntohs((header)->hlenWithFlags) & 0b0000111111111111)
+    */
 };
 
 #endif

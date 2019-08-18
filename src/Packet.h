@@ -2,16 +2,16 @@
 #define PACKET_H
 
 #include <vector>
-#include "Header.h"
+#include "Pdu.h"
 
 class Packet
 {
 private:
-    std::vector<Header*> m_headers; 
-    unsigned char* m_buffer = nullptr;
-    size_t m_bufferSize = 0;
+    std::vector<Pdu> m_pdus; 
+    std::vector<uint8_t> m_buffer;
 public:
-    Packet& operator+=(Header* header);
+    Packet& operator+=(const Pdu& pdu);
+    Packet& operator+=(Pdu&& pdu);
     void send(pcap_t* handle);
 };
 
