@@ -5,6 +5,7 @@
 
 class Ip4Addr
 {
+private:
     std::array<uint8_t, IP4_ADDR_SIZE> m_addr;
 public:
     Ip4Addr(const struct sockaddr& sockAddr);

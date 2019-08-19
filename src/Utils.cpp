@@ -6,7 +6,7 @@
 #include <stropts.h>
 #include <iostream>
 #include "Utils.h"
-#include "ArpHeader.h"
+#include "ArpPdu.h"
 
 void Utils::getMyMac(const char* iface, uint8_t myMac[6])
 {
@@ -52,7 +52,7 @@ void Utils::queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t 
         throw std::runtime_error{"Failed to set filter"};
     }
 
-    ArpHeader::request(
+    ArpPdu::request(
         handle,
         myMac,
         myIp,
@@ -64,7 +64,7 @@ void Utils::queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t 
 
     pcap_next_ex(handle, &pktHdr, &pkt);
     
-    auto arpPkt = dynamic_cast<ArpHeader*>(Header::parse(pkt, pktHdr->caplen));
-    auto arpHdr = reinterpret_cast<ArpHeaderStruct*>(arpPkt->headerStruct());
+    auto arpPkt = dynamic_cast<ArpPdu*>(Pdu::parse(pkt, pktHdr->caplen));
+    auto arpHdr = reinterpret_cast<ArpHeader*>(arpPkt->header());
     memcpy(otherMac, arpHdr->sha, 6);
 }

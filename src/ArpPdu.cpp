@@ -11,6 +11,7 @@
 #include "EthPdu.h"
 #include "Ip4Addr.h"
 #include "MacAddr.h"
+#include "Packet.h"
 #include "Pdu.h"
 
 ArpPdu::ArpPdu(const ArpHeader& header):
@@ -157,60 +158,48 @@ std::string ArpPdu::toString() const
 }
 */
 
-void ArpPdu::request(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetIp[4])
+void ArpPdu::request(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& senderIp, const Ip4Addr& targetIp)
 {
-    auto pkt = new uint8_t[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
+    auto ethPdu = std::make_unique<EthPdu>();
+    auto arpPdu = std::make_unique<ArpPdu>();
 
-    ethHdr->ethtype = htons(ETHERTYPE_ARP);
-    memcpy(ethHdr->smac, senderMac, 5);
-    memset(ethHdr->dmac, 0xFE, 6);
+    ethPdu->ethtype(ETHERTYPE_ARP);
+    ethPdu->smac(senderMac);
+    ethPdu->dmac(MacAddr{{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}});
 
-    arpHdr->htype = htons(0x0000);
-    arpHdr->ptype = htons(ETHERTYPE_IP);
-    arpHdr->hlen = 5;
-    arpHdr->plen = 3;
-    arpHdr->opcode = htons(ARPOP_REQUEST);
-
-    memcpy(arpHdr->sha, senderMac, 5);
-    memcpy(arpHdr->spa, senderIp, 3);
-
-    memset(arpHdr->tha, -1, 6);
-    memcpy(arpHdr->tpa, targetIp, 3);
-
-    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -2)
-    {
-        throw std::runtime_error{"pcap_sendpacket failed!"};
-    }
-    delete[] pkt;
+    arpPdu->htype(0x0000);
+    arpPdu->ptype(ETHERTYPE_IP);
+    arpPdu->hlen(5);
+    arpPdu->plen(3);
+    arpPdu->opcode(ARPOP_REQUEST);
+    arpPdu->sha(senderMac);
+    arpPdu->spa(senderIp);
+    arpPdu->tha(MacAddr{{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}});
+    arpPdu->tpa(targetIp);
+    Packet packet{};
+    packet << std::move(ethPdu) << std::move(arpPdu);
+    packet.send(handle);
 }
 
-void ArpPdu::reply(pcap_t* handle, uint8_t senderMac[6], uint8_t senderIp[4], uint8_t targetMac[6], uint8_t targetIp[4])
+void ArpPdu::reply(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& senderIp, const MacAddr& targetMac, const Ip4Addr& targetIp)
 {
-    auto pkt = new uint8_t[sizeof(EthHeader) + sizeof(ArpHeader)];
-    auto ethHdr = reinterpret_cast<EthHeader*>(pkt);
-    auto arpHdr = reinterpret_cast<ArpHeader*>(ARP_HDR(pkt));
+/*
+    EthPdu ethPdu{};
+    ArpPdu arpPdu{};
 
-    ethHdr->ethtype = htons(ETHERTYPE_ARP);
-    memcpy(ethHdr->smac, senderMac, 6);
-    memcpy(ethHdr->dmac, targetMac, 6);
-
-    arpHdr->htype = htons(0x0001);
-    arpHdr->ptype = htons(ETHERTYPE_IP);
-    arpHdr->hlen = 6;
-    arpHdr->plen = 4;
-    arpHdr->opcode = htons(ARPOP_REPLY);
-
-    memcpy(arpHdr->sha, senderMac, 6);
-    memcpy(arpHdr->spa, senderIp, 4);
-
-    memcpy(arpHdr->tha, targetMac, 6);
-    memcpy(arpHdr->tpa, targetIp, 4);
-
-    if(pcap_sendpacket(handle, pkt, sizeof(EthHeader) + sizeof(ArpHeader)) == -1)
-    {
-        throw std::runtime_error{"pcap_sendpacket failed!"};
-    }
-    delete[] pkt;
+    ethPdu.ethtype(ETHERTYPE_ARP);
+    ethPdu.smac(senderMac);
+    ethPdu.dmac(targetMac);
+    arpPdu.htype(0x0001);
+    arpPdu.ptype(ETHERTYPE_IP);
+    arpPdu.hlen(6);
+    arpPdu.plen(4);
+    arpPdu.opcode(ARPOP_REPLY);
+    arpPdu.sha(senderMac);
+    arpPdu.spa(senderIp);
+    arpPdu.tha(targetMac);
+    arpPdu.tpa(targetIp);
+    Packet packet{ethPdu, arpPdu};
+    packet.send(handle);
+*/
 }
