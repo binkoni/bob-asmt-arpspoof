@@ -183,23 +183,22 @@ void ArpPdu::request(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& se
 
 void ArpPdu::reply(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& senderIp, const MacAddr& targetMac, const Ip4Addr& targetIp)
 {
-/*
-    EthPdu ethPdu{};
-    ArpPdu arpPdu{};
+    auto ethPdu = std::make_unique<EthPdu>();
+    auto arpPdu = std::make_unique<ArpPdu>();
 
-    ethPdu.ethtype(ETHERTYPE_ARP);
-    ethPdu.smac(senderMac);
-    ethPdu.dmac(targetMac);
-    arpPdu.htype(0x0001);
-    arpPdu.ptype(ETHERTYPE_IP);
-    arpPdu.hlen(6);
-    arpPdu.plen(4);
-    arpPdu.opcode(ARPOP_REPLY);
-    arpPdu.sha(senderMac);
-    arpPdu.spa(senderIp);
-    arpPdu.tha(targetMac);
-    arpPdu.tpa(targetIp);
-    Packet packet{ethPdu, arpPdu};
+    ethPdu->ethtype(ETHERTYPE_ARP);
+    ethPdu->smac(senderMac);
+    ethPdu->dmac(targetMac);
+    arpPdu->htype(0x0001);
+    arpPdu->ptype(ETHERTYPE_IP);
+    arpPdu->hlen(6);
+    arpPdu->plen(4);
+    arpPdu->opcode(ARPOP_REPLY);
+    arpPdu->sha(senderMac);
+    arpPdu->spa(senderIp);
+    arpPdu->tha(targetMac);
+    arpPdu->tpa(targetIp);
+    Packet packet{};
+    packet << std::move(ethPdu) << std::move(arpPdu);
     packet.send(handle);
-*/
 }
