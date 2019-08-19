@@ -21,20 +21,22 @@
 class Pdu
 {
 private:
-    static Pdu* parseIp(const uint8_t* rawPdu, uint32_t rawPduSize);
+    static Pdu* parseIp(const uint8_t* data, uint32_t dataSize);
 protected:
-    uint32_t m_rawPduSize;
-    uint8_t* m_rawPdu;
+    uint32_t m_size;
+    uint8_t* m_data;
 public:
-    static Pdu* parse(const uint8_t* rawPdu, uint32_t rawPduSize);
+    static Pdu* parse(const uint8_t* data, uint32_t dataSize);
 
     explicit Pdu();
-    explicit Pdu(const uint8_t* rawPdu, uint32_t rawPduSize);
-    explicit Pdu(uint32_t rawPduSize);
+    explicit Pdu(const uint8_t* data, uint32_t dataSize);
+    explicit Pdu(uint32_t dataSize);
+
+    void* data() const;
+    size_t size() const;
 
     virtual ~Pdu();
-    virtual void* header() const;
-    virtual size_t headerSize() const;
+
     /*
     virtual std::string toString() const = 0;
     virtual void print(std::stringstream& sstr) const = 0;

@@ -28,109 +28,109 @@ ArpPdu::ArpPdu():
 
 uint16_t ArpPdu::htype()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return header->htype;
 }
 
 uint16_t ArpPdu::ptype()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
-    return header->ptype;
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
+    return ntohs(header->ptype);
 }
 
 uint8_t ArpPdu::hlen()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return header->hlen;
 }
 
 uint8_t ArpPdu::plen()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return header->plen;
 }
 
 uint16_t ArpPdu::opcode()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
-    return header->opcode;
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
+    return ntohs(header->opcode);
 }
 
 MacAddr ArpPdu::sha()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return MacAddr{header->sha};
 }
 
 Ip4Addr ArpPdu::spa()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return Ip4Addr{header->spa};
 }
 
 MacAddr ArpPdu::tha()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return MacAddr{header->tha};
 }
 
 Ip4Addr ArpPdu::tpa()
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     return Ip4Addr{header->tpa};
 }
 
 void ArpPdu::htype(uint16_t htype)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     header->htype = htons(htype);
 }
 
 void ArpPdu::ptype(uint16_t ptype)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     header->ptype = htons(ptype);
 }
 
 void ArpPdu::hlen(uint8_t hlen)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     header->hlen = hlen;
 }
 
 void ArpPdu::plen(uint8_t plen)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     header->plen = plen;
 }
 
 void ArpPdu::opcode(uint16_t opcode)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     header->opcode = htons(opcode);
 }
 
 void ArpPdu::sha(const MacAddr& sha)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     std::copy(sha.cbegin(), sha.cend(), header->sha);
 }
 
 void ArpPdu::spa(const Ip4Addr& spa)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     std::copy(spa.cbegin(), spa.cend(), header->spa);
 }
 
 void ArpPdu::tha(const MacAddr& tha)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     std::copy(tha.cbegin(), tha.cend(), header->tha);
 }
 
 void ArpPdu::tpa(const Ip4Addr& tpa)
 {
-    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::header());
+    auto header = reinterpret_cast<ArpHeader* const>(ArpPdu::data());
     std::copy(tpa.cbegin(), tpa.cend(), header->tpa);
 }
 

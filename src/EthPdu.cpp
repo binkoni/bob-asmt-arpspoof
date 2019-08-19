@@ -21,37 +21,37 @@ EthPdu::EthPdu():
 
 MacAddr EthPdu::dmac()
 {
-    auto header = static_cast<EthHeader* const>(EthPdu::header());
+    auto header = static_cast<EthHeader* const>(EthPdu::data());
     return MacAddr{header->dmac};
 }
 
 MacAddr EthPdu::smac()
 {
-    auto header = static_cast<EthHeader* const>(EthPdu::header());
+    auto header = static_cast<EthHeader* const>(EthPdu::data());
     return MacAddr{header->smac};
 }
 
 uint16_t EthPdu::ethtype()
 {
-    auto header = static_cast<EthHeader* const>(EthPdu::header());
+    auto header = static_cast<EthHeader* const>(EthPdu::data());
     return ntohs(header->ethtype);
 }
 
 void EthPdu::dmac(const MacAddr& dmac)
 {
-    auto header = static_cast<EthHeader* const>(EthPdu::header());
+    auto header = static_cast<EthHeader* const>(EthPdu::data());
     std::copy(dmac.cbegin(), dmac.cend(), header->dmac);
 }
 
 void EthPdu::smac(const MacAddr& smac)
 {
-    auto header = static_cast<EthHeader* const>(EthPdu::header());
+    auto header = static_cast<EthHeader* const>(EthPdu::data());
     std::copy(smac.cbegin(), smac.cend(), header->smac);
 }
 
 void EthPdu::ethtype(uint16_t ethtype)
 {
-    auto header = static_cast<EthHeader* const>(EthPdu::header());
+    auto header = static_cast<EthHeader* const>(EthPdu::data());
     header->ethtype = htons(ethtype);
 }
 

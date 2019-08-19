@@ -65,6 +65,6 @@ void Utils::queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t 
     pcap_next_ex(handle, &pktHdr, &pkt);
     
     auto arpPkt = dynamic_cast<ArpPdu*>(Pdu::parse(pkt, pktHdr->caplen));
-    auto arpHdr = reinterpret_cast<ArpHeader*>(arpPkt->header());
+    auto arpHdr = reinterpret_cast<ArpHeader*>(arpPkt->data());
     memcpy(otherMac, arpHdr->sha, 6);
 }

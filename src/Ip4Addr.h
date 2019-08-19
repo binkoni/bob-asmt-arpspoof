@@ -1,6 +1,8 @@
 #ifndef IP4_ADDR_H
 #define IP4_ADDR_H
 
+#include <array>
+
 #define IP4_ADDR_SIZE 4
 
 class Ip4Addr
