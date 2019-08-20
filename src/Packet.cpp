@@ -28,5 +28,6 @@ void Packet::send(pcap_t* handle)
         std::copy_n(header, headerSize, std::begin(m_buffer) + pduOffset);
         pduOffset += headerSize;
     }
-    pcap_sendpacket(handle, m_buffer.data(), m_buffer.size()); // == -2;
+    if(pcap_sendpacket(handle, m_buffer.data(), m_buffer.size()) == PCAP_ERROR)
+        throw std::runtime_error{"PCAP error"};
 }

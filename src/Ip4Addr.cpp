@@ -22,6 +22,24 @@ Ip4Addr::Ip4Addr(const struct sockaddr& sockAddr)
     );
 }
 
+Ip4Addr::Ip4Addr(const struct sockaddr_in& sockAddr)
+{
+    std::copy_n(
+        reinterpret_cast<const uint8_t*>(sockAddr.sin_addr.s_addr),
+        IP4_ADDR_SIZE,
+        std::begin(m_addr)
+    );
+}
+
+Ip4Addr::Ip4Addr(const struct in_addr& sockAddr)
+{
+    std::copy_n(
+        reinterpret_cast<const uint8_t*>(sockAddr.s_addr),
+        IP4_ADDR_SIZE,
+        std::begin(m_addr)
+    );
+}
+
 Ip4Addr::Ip4Addr(std::string string)
 {
     struct sockaddr_in sockAddr;

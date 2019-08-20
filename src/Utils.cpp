@@ -8,50 +8,46 @@
 #include "Utils.h"
 #include "ArpPdu.h"
 
-void Utils::getMyMac(const char* iface, uint8_t myMac[6])
+MacAddr Utils::getMyMac(const std::string& iface)
 {
     struct ifreq myMacIfr;
-    strncpy(myMacIfr.ifr_name, iface, IFNAMSIZ - 1);
+    strncpy(myMacIfr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
     auto sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     auto ret = ioctl(sock, SIOCGIFHWADDR, &myMacIfr);
     close(sock);
 
     if(ret == -1)
-        throw std::runtime_error("Failed to get Mac address");
+        throw std::runtime_error{"Failed to get Mac address"};
 
-    memcpy(myMac, myMacIfr.ifr_addr.sa_data, 6);
+    return MacAddr{reinterpret_cast<uint8_t*>(myMacIfr.ifr_addr.sa_data)};
 }
 
-
-void Utils::getMyIp(const char* iface, uint8_t myIp[4])
+Ip4Addr Utils::getMyIp(const std::string& iface)
 {
     struct ifreq myIpIfr;
-    strncpy(myIpIfr.ifr_name, iface, IFNAMSIZ - 1);
+    strncpy(myIpIfr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
     auto sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     auto ret = ioctl(sock, SIOCGIFADDR, &myIpIfr);
     close(sock);
     if(ret == -1)
         throw std::runtime_error("Failed to get IP address");
 
-    memcpy(myIp, &((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr, 4);
+    return Ip4Addr{((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr};
 }
 
-void Utils::queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4], uint8_t otherMac[6])
+MacAddr Utils::queryMac(pcap_t* handle, const MacAddr& myMac, const Ip4Addr& myIp, const Ip4Addr& otherIp)
 {
+    /*
     struct bpf_program prog;
     auto filterString = Utils::toFilterString(myMac, otherIp);
     std::cout << "filter string is " << filterString << std::endl;
 
     if(pcap_compile(handle, &prog, filterString.c_str(), 0, *reinterpret_cast<uint32_t*>(myIp)) == -1)
-    {
         throw std::runtime_error{"Failed to compile filter"};
-    }
 
     if(pcap_setfilter(handle, &prog) == -1)
-    {
         throw std::runtime_error{"Failed to set filter"};
-    }
-
+    */
     ArpPdu::request(
         handle,
         myMac,
@@ -59,12 +55,12 @@ void Utils::queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t 
         otherIp
     );
 
-    struct pcap_pkthdr* pktHdr;
-    const u_char* pkt;
+    struct pcap_pkthdr* pcapPacketHeader;
+    const u_char* pcapPacket;
 
-    pcap_next_ex(handle, &pktHdr, &pkt);
+    pcap_next_ex(handle, &pcapPacketHeader, &pcapPacket);
     
-    auto arpPkt = dynamic_cast<ArpPdu*>(Pdu::parse(pkt, pktHdr->caplen));
-    auto arpHdr = reinterpret_cast<ArpHeader*>(arpPkt->data());
-    memcpy(otherMac, arpHdr->sha, 6);
+    auto arpPacket = dynamic_cast<ArpPdu*>(Pdu::parse(pcapPacket, pcapPacketHeader->caplen));
+    auto arpHeader = reinterpret_cast<ArpHeader*>(arpPacket->data());
+    return MacAddr{arpHeader->sha};
 }

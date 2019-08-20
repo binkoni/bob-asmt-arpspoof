@@ -7,11 +7,12 @@
 #include <boost/format.hpp>
 #include <stdint.h>
 
+#include "Ip4Addr.h"
+#include "MacAddr.h"
+
 namespace Utils
 {
-    void getMyMac(const char* iface, uint8_t myMac[6]);
-    void getMyIp(const char* iface, uint8_t myIp[4]);
-
+    /*
     inline std::string toMacString(uint8_t mac[6])
     {
         return boost::str(boost::format("%02x:%02x:%02x:%02x:%02x:%02x") % int(mac[0]) % int(mac[1]) % int(mac[2]) % int(mac[3]) % int(mac[4]) % int(mac[5]));
@@ -47,8 +48,11 @@ namespace Utils
     {
         return boost::str(boost::format("(arp[6:2] = 2) and src host %s and ether dst %s") % Utils::toIpString(ip) % Utils::toMacString(mac));
     }
+    */
 
-    void queryMac(pcap_t* handle, uint8_t myMac[6], uint8_t myIp[4], uint8_t otherIp[4], uint8_t otherMac[6]);
+    MacAddr getMyMac(const std::string&);
+    Ip4Addr getMyIp(const std::string&);
+    MacAddr queryMac(pcap_t* handle, const MacAddr&, const Ip4Addr&, const Ip4Addr&);
 }
 
 #endif
