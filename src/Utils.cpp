@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <stropts.h>
 #include <iostream>
+#include <memory>
 #include "Utils.h"
 #include "ArpPdu.h"
 
@@ -60,7 +61,7 @@ MacAddr Utils::queryMac(pcap_t* handle, const MacAddr& myMac, const Ip4Addr& myI
 
     pcap_next_ex(handle, &pcapPacketHeader, &pcapPacket);
     
-    auto arpPacket = dynamic_cast<ArpPdu*>(Pdu::parse(pcapPacket, pcapPacketHeader->caplen));
+    std::unique_ptr<ArpPdu> arpPacket{static_cast<ArpPdu*>(Pdu::parse(pcapPacket, pcapPacketHeader->caplen).release())};
     auto arpHeader = reinterpret_cast<ArpHeader*>(arpPacket->data());
     return MacAddr{arpHeader->sha};
 }

@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <memory>
+
 #include "Pdu.h"
 #include "RawPdu.h"
 #include "EthPdu.h"
@@ -37,7 +39,7 @@ size_t Pdu::size() const
     return m_size;
 }
 
-Pdu* Pdu::parse(const uint8_t* data, uint32_t size)
+std::unique_ptr<Pdu> Pdu::parse(const uint8_t* data, uint32_t size)
 {
     auto ethHeader = reinterpret_cast<const EthHeader*>(data);
     switch(MY_NTOHS(ethHeader->ethtype))
@@ -45,21 +47,19 @@ Pdu* Pdu::parse(const uint8_t* data, uint32_t size)
         case 0x0800:
             return parseIp(data, size);
         case 0x0806:
-            return new ArpPdu{reinterpret_cast<const ArpHeader*>(data + sizeof(EthHeader))};
+            return std::make_unique<ArpPdu>(reinterpret_cast<const ArpHeader*>(data + sizeof(EthHeader)));
         default:
-            return new RawPdu{};
+            return std::make_unique<RawPdu>();
     }
     return nullptr;
 }
 
-Pdu* Pdu::parseIp(const uint8_t* data, uint32_t size)
+std::unique_ptr<Pdu> Pdu::parseIp(const uint8_t* data, uint32_t size)
 {
     auto ip4Header = reinterpret_cast<const Ip4Header*>(IP_HDR(data));
     if(ip4Header->proto == 0x06)
-    {
-        return new TcpPdu{reinterpret_cast<const TcpHeader*>(data + sizeof(EthHeader) + ip4Header->hlen * 4)};
-    }
-    return new RawPdu{};
+        return std::make_unique<TcpPdu>(reinterpret_cast<const TcpHeader*>(data + sizeof(EthHeader) + ip4Header->hlen * 4));
+    return std::make_unique<RawPdu>();
 }
 /*
 std::ostream& operator<<(std::ostream& ostr, const Pdu& packet)

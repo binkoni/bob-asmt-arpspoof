@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <sstream>
+#include <memory>
 #include <pcap.h>
 
 #define MY_NTOHS(n) ((uint16_t)((n & 0x00ff) << 8 | (n & 0xff00) >> 8))
@@ -21,12 +22,12 @@
 class Pdu
 {
 private:
-    static Pdu* parseIp(const uint8_t* data, uint32_t dataSize);
+    static std::unique_ptr<Pdu> parseIp(const uint8_t* data, uint32_t dataSize);
 protected:
     uint32_t m_size;
     uint8_t* m_data;
 public:
-    static Pdu* parse(const uint8_t* data, uint32_t dataSize);
+    static std::unique_ptr<Pdu> parse(const uint8_t* data, uint32_t dataSize);
 
     explicit Pdu();
     explicit Pdu(const uint8_t* data, uint32_t dataSize);
