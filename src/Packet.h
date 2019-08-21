@@ -12,7 +12,7 @@ private:
     std::vector<std::unique_ptr<Pdu>> m_pdus; 
     std::vector<uint8_t> m_buffer;
 public:
-    explicit Packet();
+    explicit Packet() = default;
     void resizeBuffer(const Pdu& newPdu);
     Packet& operator<<(std::unique_ptr<Pdu>&& newpdu);
     void send(pcap_t* handle);

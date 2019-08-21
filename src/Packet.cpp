@@ -4,8 +4,6 @@
 #include <pcap.h>
 #include "Packet.h"
 
-Packet::Packet() {}
-
 void Packet::resizeBuffer(const Pdu& newPdu)
 {
     m_buffer.resize(m_buffer.size() + newPdu.size());

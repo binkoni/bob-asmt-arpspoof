@@ -11,6 +11,7 @@ class MacAddr
 public:
     MacAddr(uint8_t[MAC_ADDR_SIZE]);
     MacAddr(const std::array<uint8_t, MAC_ADDR_SIZE>&);
+    std::string toString();
     std::array<uint8_t, MAC_ADDR_SIZE>::iterator begin();
     std::array<uint8_t, MAC_ADDR_SIZE>::const_iterator cbegin() const;
     std::array<uint8_t, MAC_ADDR_SIZE>::iterator end();

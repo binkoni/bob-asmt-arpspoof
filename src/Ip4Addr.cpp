@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <arpa/inet.h>
+#include <boost/format.hpp>
 #include "Ip4Addr.h"
 
 Ip4Addr::Ip4Addr(const char* str)
@@ -7,7 +8,7 @@ Ip4Addr::Ip4Addr(const char* str)
     struct sockaddr_in sockAddr;
     inet_pton(AF_INET, str, &sockAddr.sin_addr);
     std::copy_n(
-        reinterpret_cast<uint8_t*>(&sockAddr.sin_addr),
+        reinterpret_cast<uint8_t*>(&sockAddr.sin_addr.s_addr),
         IP4_ADDR_SIZE,
         std::begin(m_addr)
     );
@@ -16,7 +17,7 @@ Ip4Addr::Ip4Addr(const char* str)
 Ip4Addr::Ip4Addr(const struct sockaddr& sockAddr)
 {
     std::copy_n(
-        reinterpret_cast<const uint8_t*>(reinterpret_cast<const struct sockaddr_in*>(&sockAddr)->sin_addr.s_addr),
+        reinterpret_cast<const uint8_t*>(&reinterpret_cast<const struct sockaddr_in*>(&sockAddr)->sin_addr.s_addr),
         IP4_ADDR_SIZE,
         std::begin(m_addr)
     );
@@ -25,7 +26,7 @@ Ip4Addr::Ip4Addr(const struct sockaddr& sockAddr)
 Ip4Addr::Ip4Addr(const struct sockaddr_in& sockAddr)
 {
     std::copy_n(
-        reinterpret_cast<const uint8_t*>(sockAddr.sin_addr.s_addr),
+        reinterpret_cast<const uint8_t*>(&sockAddr.sin_addr.s_addr),
         IP4_ADDR_SIZE,
         std::begin(m_addr)
     );
@@ -34,7 +35,7 @@ Ip4Addr::Ip4Addr(const struct sockaddr_in& sockAddr)
 Ip4Addr::Ip4Addr(const struct in_addr& sockAddr)
 {
     std::copy_n(
-        reinterpret_cast<const uint8_t*>(sockAddr.s_addr),
+        reinterpret_cast<const uint8_t*>(&sockAddr.s_addr),
         IP4_ADDR_SIZE,
         std::begin(m_addr)
     );
@@ -68,6 +69,11 @@ Ip4Addr::Ip4Addr(uint8_t arr[IP4_ADDR_SIZE])
 Ip4Addr::Ip4Addr(std::array<uint8_t, IP4_ADDR_SIZE> arr)
 {
     m_addr = arr;
+}
+
+std::string Ip4Addr::toString()
+{
+    return boost::str(boost::format("%d.%d.%d.%d") % int(m_addr[0]) % int(m_addr[1]) % int(m_addr[2]) % int(m_addr[3]));
 }
 
 std::array<uint8_t, IP4_ADDR_SIZE>::iterator Ip4Addr::begin()

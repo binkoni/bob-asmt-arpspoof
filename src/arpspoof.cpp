@@ -100,6 +100,7 @@ int main(int argc, char** argv) {
 
 int main(int argc, char* argv[])
 {
+/*
     if(argc < 4 || argc % 2 != 0)
     {
         printHelp(argv[0]);
@@ -110,6 +111,7 @@ int main(int argc, char* argv[])
         printf("%s\n", argv[i]);
         printf("%s\n", argv[i + 1]);
     }
+*/
     /*
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
@@ -149,4 +151,5 @@ int main(int argc, char* argv[])
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthPduStruct) - 10) == -2)
         return -1;
     */
+    std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
 }
