@@ -139,11 +139,12 @@ void ArpPdu::print(std::stringstream& sstr) const
 {
     sstr << ArpPdu::toString() << std::endl;
 }
+*/
 
 std::string ArpPdu::toString() const
 {
     std::stringstream sstr;
-    auto hdr = reinterpret_cast<ArpHeader*>(header());
+    auto hdr = static_cast<ArpHeader*>(ArpPdu::data());
     sstr << boost::format("arp htype 0x%02X\n") % int(MY_NTOHS(hdr->htype));
     sstr << boost::format("arp ptype 0x%02X\n") % int(MY_NTOHS(hdr->ptype));
     sstr << boost::format("arp hlen 0x%01X\n") % int(hdr->hlen);
@@ -156,7 +157,6 @@ std::string ArpPdu::toString() const
     sstr << boost::format("arp tpa %d.%d.%d.%d\n") % int(hdr->tpa[0]) % int(hdr->tpa[1]) % int(hdr->tpa[2]) % int(hdr->tpa[3]);
     return sstr.str();
 }
-*/
 
 void ArpPdu::request(pcap_t* handle, const MacAddr& senderMac, const Ip4Addr& senderIp, const Ip4Addr& targetIp)
 {

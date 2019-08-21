@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <string>
 #include <memory>
+#include <iostream>
 #include <pcap.h>
+#include "EthPdu.h"
 #include "Packet.h"
 
 void Packet::resizeBuffer(const Pdu& newPdu)
@@ -15,6 +17,76 @@ Packet& Packet::operator<<(std::unique_ptr<Pdu>&& newpdu)
     m_pdus.push_back(std::move(newpdu));
     return *this;
 }
+
+std::vector<std::unique_ptr<Pdu>>::iterator Packet::begin()
+{
+    return m_pdus.begin();
+}
+
+std::vector<std::unique_ptr<Pdu>>::const_iterator Packet::cbegin() const
+{
+    return m_pdus.cbegin();
+}
+
+std::vector<std::unique_ptr<Pdu>>::iterator Packet::end()
+{
+    return m_pdus.end();
+}
+
+std::vector<std::unique_ptr<Pdu>>::const_iterator Packet::cend() const
+{
+    return m_pdus.cend();
+}
+
+/*
+Packet Packet::parse(const u_char* data, size_t size)
+{
+    Packet packet{};
+    std::cout << "parse" << std::endl;
+    //for(auto pdu = Pdu::parse(data, size); pdu != nullptr; data += pdu->size(), pdu = Pdu::parse(data, size))
+    //    packet << std::move(pdu);
+    auto pdu = Pdu::parse(data, size);
+    std::cout << pdu->toString() << " " << pdu->size() << std::endl;
+    
+    return packet;
+}
+*/
+Packet Packet::parse(const uint8_t* data, size_t size)
+{
+    Packet packet{};
+    packet << std::make_unique<EthPdu>(data);
+    /*
+    auto ethHeader = reinterpret_cast<const EthHeader*>(data);
+    printf("ethtype is %x\n", MY_NTOHS(ethHeader->ethtype));
+    switch(MY_NTOHS(ethHeader->ethtype))
+    {
+        case 0x0800:
+            return parseIp(data, size);
+        case 0x0806:
+            return std::make_unique<ArpPdu>(reinterpret_cast<const ArpHeader*>(data + sizeof(EthHeader)));
+        default:
+            return std::make_unique<RawPdu>();
+    }
+    return nullptr;
+    */
+    return packet;
+}
+/*
+std::unique_ptr<Pdu> Pdu::parseIp(const uint8_t* data, size_t size)
+{
+    auto ip4Header = reinterpret_cast<const Ip4Header*>(IP_HDR(data));
+    if(ip4Header->proto == 0x06)
+        return std::make_unique<TcpPdu>(reinterpret_cast<const TcpHeader*>(data + sizeof(EthHeader) + ip4Header->hlen * 4));
+    return std::make_unique<RawPdu>();
+}
+*/
+/*
+std::ostream& operator<<(std::ostream& ostr, const Pdu& packet)
+{
+    ostr << std::move(packet.toString());
+    return ostr;
+}
+*/
 
 void Packet::send(pcap_t* handle)
 {

@@ -35,10 +35,9 @@ Ip4Addr Utils::getMyIp(const std::string& iface)
 
     return Ip4Addr{((struct sockaddr_in*)&myIpIfr.ifr_addr)->sin_addr};
 }
-
+/*
 MacAddr Utils::queryMac(pcap_t* handle, const MacAddr& myMac, const Ip4Addr& myIp, const Ip4Addr& otherIp)
 {
-    /*
     struct bpf_program prog;
     auto filterString = Utils::toFilterString(myMac, otherIp);
     std::cout << "filter string is " << filterString << std::endl;
@@ -48,7 +47,6 @@ MacAddr Utils::queryMac(pcap_t* handle, const MacAddr& myMac, const Ip4Addr& myI
 
     if(pcap_setfilter(handle, &prog) == -1)
         throw std::runtime_error{"Failed to set filter"};
-    */
     ArpPdu::request(
         handle,
         myMac,
@@ -64,4 +62,4 @@ MacAddr Utils::queryMac(pcap_t* handle, const MacAddr& myMac, const Ip4Addr& myI
     std::unique_ptr<ArpPdu> arpPacket{static_cast<ArpPdu*>(Pdu::parse(pcapPacket, pcapPacketHeader->caplen).release())};
     auto arpHeader = reinterpret_cast<ArpHeader*>(arpPacket->data());
     return MacAddr{arpHeader->sha};
-}
+}*/

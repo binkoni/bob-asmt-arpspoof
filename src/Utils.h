@@ -52,7 +52,7 @@ namespace Utils
 
     MacAddr getMyMac(const std::string&);
     Ip4Addr getMyIp(const std::string&);
-    MacAddr queryMac(pcap_t* handle, const MacAddr&, const Ip4Addr&, const Ip4Addr&);
+    //MacAddr queryMac(pcap_t* handle, const MacAddr&, const Ip4Addr&, const Ip4Addr&);
 }
 
 #endif

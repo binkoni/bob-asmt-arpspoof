@@ -21,6 +21,7 @@ public:
     explicit EthPdu();
     explicit EthPdu(const EthHeader& header);
     explicit EthPdu(const EthHeader* header);
+    explicit EthPdu(const uint8_t* header);
 
     MacAddr dmac();
     MacAddr smac();
@@ -32,8 +33,8 @@ public:
 
     /*
     virtual void print(std::stringstream& sstr) const override;
-    virtual std::string toString() const override;
     */
+    virtual std::string toString() const override;
 };
 
 #endif

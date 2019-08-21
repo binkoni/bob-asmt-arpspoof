@@ -23,9 +23,8 @@ void TcpPdu::print(std::stringstream& sstr) const
 {
     sstr << TcpPdu::toString() << std::endl;
 }
-
+*/
 std::string TcpPdu::toString() const
 {
     return "TcpPdu";
 }
-*/

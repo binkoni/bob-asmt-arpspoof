@@ -12,9 +12,14 @@ private:
     std::vector<std::unique_ptr<Pdu>> m_pdus; 
     std::vector<uint8_t> m_buffer;
 public:
+    static Packet parse(const u_char* data, size_t size);
     explicit Packet() = default;
     void resizeBuffer(const Pdu& newPdu);
     Packet& operator<<(std::unique_ptr<Pdu>&& newpdu);
+    std::vector<std::unique_ptr<Pdu>>::iterator begin();
+    std::vector<std::unique_ptr<Pdu>>::const_iterator cbegin() const;
+    std::vector<std::unique_ptr<Pdu>>::iterator end();
+    std::vector<std::unique_ptr<Pdu>>::const_iterator cend() const;
     void send(pcap_t* handle);
 };
 

@@ -22,28 +22,23 @@
 class Pdu
 {
 private:
-    static std::unique_ptr<Pdu> parseIp(const uint8_t* data, uint32_t dataSize);
+    static std::unique_ptr<Pdu> parseIp(const uint8_t*, size_t);
 protected:
-    uint32_t m_size;
+    size_t m_size;
     uint8_t* m_data;
 public:
-    static std::unique_ptr<Pdu> parse(const uint8_t* data, uint32_t dataSize);
-
     explicit Pdu();
-    explicit Pdu(const uint8_t* data, uint32_t dataSize);
-    explicit Pdu(uint32_t dataSize);
+    explicit Pdu(const uint8_t*, size_t);
+    explicit Pdu(size_t);
 
     void* data() const;
     size_t size() const;
 
     virtual ~Pdu();
 
-    /*
     virtual std::string toString() const = 0;
-    virtual void print(std::stringstream& sstr) const = 0;
-    friend std::ostream& operator<<(std::ostream& ostr, const Pdu& packet);
-    */
-    //void send(pcap_t* handle);
+    friend std::ostream& operator<<(std::ostream&, const Pdu&);
+    //virtual void print(std::stringstream& sstr) const = 0;
 };
 
 #endif

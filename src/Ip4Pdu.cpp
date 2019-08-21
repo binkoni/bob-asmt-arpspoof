@@ -143,9 +143,9 @@ void Ip4Pdu::print(std::stringstream& sstr) const
     Ip4Pdu::print(sstr);
     sstr << Ip4Pdu::toString() << std::endl;
 }
+*/
 
 std::string Ip4Pdu::toString() const
 {
     return "Ip4Pdu";
 }
-*/

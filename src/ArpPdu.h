@@ -54,11 +54,8 @@ public:
     void tha(const MacAddr&);
     void tpa(const Ip4Addr&);
 
-    /*
     virtual std::string toString() const override;
-    virtual void print(std::stringstream& sstr) const override;
-    */
-    //void send(pcap_t* handle);
+    //virtual void print(std::stringstream& sstr) const override;
 };
 
 #endif

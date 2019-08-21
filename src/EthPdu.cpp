@@ -15,6 +15,10 @@ EthPdu::EthPdu(const EthHeader* header):
     Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(EthHeader)}
 {}
 
+EthPdu::EthPdu(const uint8_t* header):
+    Pdu{header, sizeof(EthHeader)}
+{}
+
 EthPdu::EthPdu():
     Pdu{sizeof(EthHeader)}
 {}
@@ -60,15 +64,14 @@ void EthPdu::print(std::stringstream& sstr) const
 {
     sstr << EthPdu::toString() << std::endl;
 }
+*/
 
 std::string EthPdu::toString() const
 {
     std::stringstream sstr;
-    auto hdr = static_cast<EthHeader*>(header());
+    auto hdr = static_cast<EthHeader*>(EthPdu::data());
     sstr << boost::format("eth dmac %02X:%02X:%02X:%02X:%02X:%02X\n") % int(hdr->dmac[0]) % int(hdr->dmac[1]) % int(hdr->dmac[2]) % int(hdr->dmac[3]) % int(hdr->dmac[4]) % int(hdr->dmac[5]);
     sstr << boost::format("eth smac %02X:%02X:%02X:%02X:%02X:%02X\n") % int(hdr->smac[0]) % int(hdr->smac[1]) % int(hdr->smac[2]) % int(hdr->smac[3]) % int(hdr->smac[4]) % int(hdr->smac[5]);
     sstr << boost::format("eth type 0x%04X\n") % int(MY_NTOHS(hdr->ethtype));
-
     return sstr.str();
 }
-*/

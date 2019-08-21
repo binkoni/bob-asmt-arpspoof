@@ -53,10 +53,8 @@ public:
     void sip(const Ip4Addr&);
     void dip(const Ip4Addr&);
 
-    /*
-    virtual void print(std::stringstream& sstr) const override;
+    //virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
-    */
 };
 
 #endif

@@ -8,11 +8,9 @@
 class RawPdu: public Pdu
 {
 public:
-    explicit RawPdu();
-/*
-    virtual void print(std::stringstream& sstr) const override;
+    explicit RawPdu() = default;
+    //virtual void print(std::stringstream& sstr) const override;
     virtual std::string toString() const override;
-*/
 };
 
 #endif

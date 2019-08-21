@@ -100,19 +100,18 @@ int main(int argc, char** argv) {
 
 int main(int argc, char* argv[])
 {
-/*
     if(argc < 4 || argc % 2 != 0)
     {
         printHelp(argv[0]);
         std::exit(EXIT_FAILURE);
     }
-    for(int i = 1; i < argc; i += 2)
+
+    for(int i = 2; i < argc - 1; i += 2)
     {
         printf("%s\n", argv[i]);
         printf("%s\n", argv[i + 1]);
     }
-*/
-    /*
+
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
     if(handle == NULL)
@@ -120,7 +119,15 @@ int main(int argc, char* argv[])
         std::cout << errbuf << std::endl;
         return -1;
     }
+    struct pcap_pkthdr* pkt_header;
+    const u_char* pkt_data;
+    pcap_next_ex(handle, &pkt_header, &pkt_data);
 
+    auto packet = Packet::parse(pkt_data, pkt_header->caplen);
+    for(auto it = packet.cbegin(); it != packet.cend(); ++it)
+        std::cout << (*it)->toString() << std::endl;
+
+    /*
     EthPdu ethPdu{};
     auto ethPduStruct = static_cast<EthPduStruct*>(ethPdu.headerStruct());
     ethPduStruct->smac[0] = 0x00;
@@ -137,7 +144,7 @@ int main(int argc, char* argv[])
     ethPduStruct->dmac[4] = 0x04;
     ethPduStruct->dmac[5] = 0x05;
     ethPduStruct->ethtype = ETHERTYPE_LOOPBACK;
-
+    
     ArpPdu arpPdu{};
     auto arpPduStruct = static_cast<ArpPduStruct*>(arpPdu.headerStruct());
 
@@ -151,5 +158,8 @@ int main(int argc, char* argv[])
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthPduStruct) - 10) == -2)
         return -1;
     */
+
     std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
+    std::cout << Utils::getMyMac("wlp1s0").toString() << std::endl;
+
 }
