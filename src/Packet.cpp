@@ -3,7 +3,11 @@
 #include <memory>
 #include <iostream>
 #include <pcap.h>
+#include "RawPdu.h"
 #include "EthPdu.h"
+#include "ArpPdu.h"
+#include "Ip4Pdu.h"
+#include "TcpPdu.h"
 #include "Packet.h"
 
 void Packet::resizeBuffer(const Pdu& newPdu)
@@ -54,7 +58,27 @@ Packet Packet::parse(const u_char* data, size_t size)
 Packet Packet::parse(const uint8_t* data, size_t size)
 {
     Packet packet{};
-    packet << std::make_unique<EthPdu>(data);
+    auto ethPdu = std::make_unique<EthPdu>(data);
+    const auto ethtype = ethPdu->ethtype();
+    packet << std::move(ethPdu);
+    switch(ethtype)
+    {
+        case 0x0800:
+            {
+                auto ip4Pdu = std::make_unique<Ip4Pdu>(data + sizeof(EthHeader));
+                auto proto = ip4Pdu->proto();
+                packet << std::move(ip4Pdu);
+                if(proto == 0x06)
+                    packet << std::make_unique<TcpPdu>(data + sizeof(EthHeader) + ip4Pdu->hlen() * 4);
+            }
+            break;
+        case 0x0806:
+            packet << std::make_unique<ArpPdu>(data + sizeof(EthHeader));
+            break;
+        default:
+            packet << std::make_unique<RawPdu>(data, size);
+            break;
+    }
     /*
     auto ethHeader = reinterpret_cast<const EthHeader*>(data);
     printf("ethtype is %x\n", MY_NTOHS(ethHeader->ethtype));

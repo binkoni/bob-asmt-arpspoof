@@ -30,6 +30,7 @@ public:
 
     explicit ArpPdu(const ArpHeader& header);
     explicit ArpPdu(const ArpHeader* header);
+    explicit ArpPdu(const uint8_t* header);
     explicit ArpPdu();
 
     uint16_t htype();

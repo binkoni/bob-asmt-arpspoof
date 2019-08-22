@@ -2,6 +2,10 @@
 #include "Ip4Pdu.h"
 #include "Pdu.h"
 
+Ip4Pdu::Ip4Pdu():
+    Pdu{sizeof(Ip4Header)}
+{}
+
 Ip4Pdu::Ip4Pdu(const Ip4Header& header):
     Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(Ip4Header)}
 {}
@@ -10,8 +14,8 @@ Ip4Pdu::Ip4Pdu(const Ip4Header* header):
     Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(Ip4Header)}
 {}
 
-Ip4Pdu::Ip4Pdu():
-    Pdu{sizeof(Ip4Header)}
+Ip4Pdu::Ip4Pdu(const uint8_t* header):
+    Pdu{header, sizeof(Ip4Header)}
 {}
 
 uint8_t Ip4Pdu::hlen()
@@ -23,7 +27,7 @@ uint8_t Ip4Pdu::hlen()
 uint8_t Ip4Pdu::ver()
 {
     auto header = static_cast<Ip4Header* const>(Ip4Pdu::data());
-    return header->hlen;
+    return header->ver;
 }
 
 uint8_t Ip4Pdu::tos()

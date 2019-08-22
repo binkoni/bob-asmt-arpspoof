@@ -21,9 +21,10 @@ struct TcpHeader {
 class TcpPdu: public Pdu
 {
 public:
+    explicit TcpPdu();
     explicit TcpPdu(const TcpHeader& header);
     explicit TcpPdu(const TcpHeader* header);
-    explicit TcpPdu();
+    explicit TcpPdu(const uint8_t* header);
     #define TCP_PDU_HLEN(header) ((ntohs((header)->hlenWithFlags) & 0b1111000000000000) >> 4)
     #define TCP_PDU_FLAGS(header) (ntohs((header)->hlenWithFlags) & 0b0000111111111111)
     //virtual void print(std::stringstream& sstr) const;

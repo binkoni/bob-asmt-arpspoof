@@ -25,9 +25,10 @@ struct Ip4Header
 class Ip4Pdu: public Pdu
 {
 public:
+    explicit Ip4Pdu();
     explicit Ip4Pdu(const Ip4Header& header);
     explicit Ip4Pdu(const Ip4Header* header);
-    explicit Ip4Pdu();
+    explicit Ip4Pdu(const uint8_t* header);
 
     uint8_t hlen();
     uint8_t ver();

@@ -123,9 +123,12 @@ int main(int argc, char* argv[])
     const u_char* pkt_data;
     pcap_next_ex(handle, &pkt_header, &pkt_data);
 
-    auto packet = Packet::parse(pkt_data, pkt_header->caplen);
-    for(auto it = packet.cbegin(); it != packet.cend(); ++it)
-        std::cout << (*it)->toString() << std::endl;
+    while(true)
+    {
+        auto packet = Packet::parse(pkt_data, pkt_header->caplen);
+        for(auto it = packet.cbegin(); it != packet.cend(); ++it)
+            std::cout << (*it)->toString() << std::endl;
+    }
 
     /*
     EthPdu ethPdu{};
@@ -159,7 +162,7 @@ int main(int argc, char* argv[])
         return -1;
     */
 
-    std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
+/*    std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
     std::cout << Utils::getMyMac("wlp1s0").toString() << std::endl;
-
+*/
 }
