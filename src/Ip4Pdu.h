@@ -30,17 +30,17 @@ public:
     explicit Ip4Pdu(const Ip4Header* header);
     explicit Ip4Pdu(const uint8_t* header);
 
-    uint8_t hlen();
-    uint8_t ver();
-    uint8_t tos();
-    uint16_t tlen();
-    uint16_t id();
-    uint16_t flags();
-    uint8_t ttl();
-    uint8_t proto();
-    uint16_t chksum();
-    Ip4Addr sip();
-    Ip4Addr dip();
+    uint8_t hlen() const;
+    uint8_t ver() const;
+    uint8_t tos() const;
+    uint16_t tlen() const;
+    uint16_t id() const;
+    uint16_t flags() const;
+    uint8_t ttl() const;
+    uint8_t proto() const;
+    uint16_t chksum() const;
+    Ip4Addr sip() const;
+    Ip4Addr dip() const;
 
     void hlen(uint8_t);
     void ver(uint8_t);
@@ -55,7 +55,8 @@ public:
     void dip(const Ip4Addr&);
 
     //virtual void print(std::stringstream& sstr) const override;
-    virtual std::string toString() const override;
+    virtual std::string toString() const;
+
 };
 
 #endif

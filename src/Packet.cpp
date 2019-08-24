@@ -66,10 +66,11 @@ Packet Packet::parse(const uint8_t* data, size_t size)
         case 0x0800:
             {
                 auto ip4Pdu = std::make_unique<Ip4Pdu>(data + sizeof(EthHeader));
-                auto proto = ip4Pdu->proto();
+                const auto proto = ip4Pdu->proto();
+                const auto hlen = ip4Pdu->hlen();
                 packet << std::move(ip4Pdu);
                 if(proto == 0x06)
-                    packet << std::make_unique<TcpPdu>(data + sizeof(EthHeader) + ip4Pdu->hlen() * 4);
+                    packet << std::make_unique<TcpPdu>(data + sizeof(EthHeader) + hlen * 4);
             }
             break;
         case 0x0806:
@@ -95,6 +96,7 @@ Packet Packet::parse(const uint8_t* data, size_t size)
     */
     return packet;
 }
+
 /*
 std::unique_ptr<Pdu> Pdu::parseIp(const uint8_t* data, size_t size)
 {
