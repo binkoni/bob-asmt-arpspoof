@@ -126,8 +126,9 @@ int main(int argc, char* argv[])
     while(true)
     {
         auto packet = Packet::parse(pkt_data, pkt_header->caplen);
-        for(auto it = packet.cbegin(); it != packet.cend(); ++it)
+        for(auto it = packet.crbegin(); it != packet.crend(); ++it)
             std::cout << (*it)->toString() << std::endl;
+        std::cout << std::string(10, '-') << std::endl;
     }
 
     /*

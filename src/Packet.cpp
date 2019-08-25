@@ -42,6 +42,26 @@ std::vector<std::unique_ptr<Pdu>>::const_iterator Packet::cend() const
     return m_pdus.cend();
 }
 
+std::vector<std::unique_ptr<Pdu>>::reverse_iterator Packet::rbegin()
+{
+    return m_pdus.rbegin();
+}
+
+std::vector<std::unique_ptr<Pdu>>::const_reverse_iterator Packet::crbegin() const
+{
+    return m_pdus.crbegin();
+}
+
+std::vector<std::unique_ptr<Pdu>>::reverse_iterator Packet::rend()
+{
+    return m_pdus.rend();
+}
+
+std::vector<std::unique_ptr<Pdu>>::const_reverse_iterator Packet::crend() const
+{
+    return m_pdus.crend();
+}
+
 /*
 Packet Packet::parse(const u_char* data, size_t size)
 {

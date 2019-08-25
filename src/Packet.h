@@ -20,6 +20,11 @@ public:
     std::vector<std::unique_ptr<Pdu>>::const_iterator cbegin() const;
     std::vector<std::unique_ptr<Pdu>>::iterator end();
     std::vector<std::unique_ptr<Pdu>>::const_iterator cend() const;
+    std::vector<std::unique_ptr<Pdu>>::reverse_iterator rbegin();
+    std::vector<std::unique_ptr<Pdu>>::const_reverse_iterator crbegin() const;
+    std::vector<std::unique_ptr<Pdu>>::reverse_iterator rend();
+    std::vector<std::unique_ptr<Pdu>>::const_reverse_iterator crend() const;
+
     void send(pcap_t* handle);
 };
 
