@@ -18,7 +18,7 @@ struct TcpHeader {
     uint16_t winsize;
     uint16_t chksum;
     uint16_t urgptr;
-    uint8_t options[8];
+    uint8_t options[40];
 } __attribute__((packed));
 
 class TcpPdu: public Pdu

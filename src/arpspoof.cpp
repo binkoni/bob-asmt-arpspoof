@@ -100,6 +100,7 @@ int main(int argc, char** argv) {
 
 int main(int argc, char* argv[])
 {
+
     if(argc < 4 || argc % 2 != 0)
     {
         printHelp(argv[0]);
@@ -131,7 +132,6 @@ int main(int argc, char* argv[])
         std::cout << std::string(10, '-') << std::endl;
     }
 
-    /*
     EthPdu ethPdu{};
     auto ethPduStruct = static_cast<EthPduStruct*>(ethPdu.headerStruct());
     ethPduStruct->smac[0] = 0x00;
@@ -161,9 +161,7 @@ int main(int argc, char* argv[])
         return -1;
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthPduStruct) - 10) == -2)
         return -1;
-    */
 
-/*    std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
+    std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
     std::cout << Utils::getMyMac("wlp1s0").toString() << std::endl;
-*/
 }

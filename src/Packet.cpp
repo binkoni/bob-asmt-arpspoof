@@ -1,7 +1,8 @@
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <memory>
-#include <iostream>
+#include <net/ethernet.h>
 #include <pcap.h>
 #include "RawPdu.h"
 #include "EthPdu.h"
@@ -83,7 +84,7 @@ Packet Packet::parse(const uint8_t* data, size_t size)
     packet << std::move(ethPdu);
     switch(ethtype)
     {
-        case 0x0800:
+        case ETHERTYPE_IP:
             {
                 auto ip4Pdu = std::make_unique<Ip4Pdu>(data + sizeof(EthHeader));
                 const auto proto = ip4Pdu->proto();
@@ -93,7 +94,7 @@ Packet Packet::parse(const uint8_t* data, size_t size)
                     packet << std::make_unique<TcpPdu>(data + sizeof(EthHeader) + hlen * 4);
             }
             break;
-        case 0x0806:
+        case ETHERTYPE_ARP:
             packet << std::make_unique<ArpPdu>(data + sizeof(EthHeader));
             break;
         default:

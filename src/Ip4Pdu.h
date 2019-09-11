@@ -20,6 +20,7 @@ struct Ip4Header
     uint16_t chksum;
     uint8_t sip[4];
     uint8_t dip[4];
+    uint8_t options[40];
 } __attribute__((packed));
 
 class Ip4Pdu: public Pdu
