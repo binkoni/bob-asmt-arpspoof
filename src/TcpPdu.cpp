@@ -5,21 +5,33 @@
 #include "TcpPdu.h"
 #include "Pdu.h"
 
-TcpPdu::TcpPdu():
-    Pdu{sizeof(TcpHeader)}
-{}
+TcpPdu::TcpPdu(size_t hlen)
+{
+    Pdu::parse(sizeof(TcpHeader));
+    m_options.reserve(hlen * 4 - sizeof(TcpHeader));
+    TcpPdu::hlen(hlen);
+}
+
+TcpPdu::TcpPdu(const uint8_t* header)
+{
+    Pdu::parse(header, sizeof(TcpHeader));
+    const auto hlen = TcpPdu::hlen();
+    m_options.reserve(hlen * 4);
+    std::copy_n(header + sizeof(TcpHeader), hlen * 4, m_options.begin());
+}
 
 TcpPdu::TcpPdu(const TcpHeader& header):
-    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(TcpHeader)}
+TcpPdu::TcpPdu{reinterpret_cast<const uint8_t*>(&header), sizeof(TcpHeader)}
 {}
 
 TcpPdu::TcpPdu(const TcpHeader* header):
-    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(TcpHeader)}
+TcpPdu::TcpPdu{reinterpret_cast<const uint8_t*>(header), sizeof(TcpHeader)}
 {}
 
-TcpPdu::TcpPdu(const uint8_t* header):
-    Pdu{header, sizeof(TcpHeader)}
-{}
+constexpr uint8_t TcpPdu::defaultSize() const
+{
+    return 20;
+}
 
 uint16_t TcpPdu::sport() const
 {

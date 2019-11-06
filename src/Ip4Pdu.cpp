@@ -3,21 +3,33 @@
 #include "Ip4Pdu.h"
 #include "Pdu.h"
 
-Ip4Pdu::Ip4Pdu():
-    Pdu{sizeof(Ip4Header)}
-{}
+Ip4Pdu::Ip4Pdu(size_t hlen)
+{
+    Pdu::parse(sizeof(Ip4Header));
+    m_options.reserve(hlen * 4 - sizeof(Ip4Header));
+    Ip4Pdu::hlen(hlen);
+}
+
+Ip4Pdu::Ip4Pdu(const uint8_t* header):
+{
+    Pdu::parse(header, sizeof(Ip4Header));
+    const auto hlen = Ip4Pdu::hlen();
+    m_options.reserve(hlen * 4);
+    std::copy_n(header + sizeof(Ip4Header), hlen * 4, m_options.begin());
+}
 
 Ip4Pdu::Ip4Pdu(const Ip4Header& header):
-    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(Ip4Header)}
+Ip4Pdu::Ip4Pdu(reinterpret_cast<const uint8_t*>(&header), sizeof(Ip4Header));
 {}
 
 Ip4Pdu::Ip4Pdu(const Ip4Header* header):
-    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(Ip4Header)}
+Ip4Pdu::Ip4Pdu(reinterpret_cast<const uint8_t*>(header), sizeof(Ip4Header));
 {}
 
-Ip4Pdu::Ip4Pdu(const uint8_t* header):
-    Pdu{header, sizeof(Ip4Header)}
-{}
+constexpr uint8_t Ip4Pdu::defaultSize() const
+{
+    return 20;
+}
 
 uint8_t Ip4Pdu::hlen() const
 {
@@ -121,27 +133,32 @@ void Ip4Pdu::ttl(uint8_t ttl)
     auto header = static_cast<Ip4Header* const>(Ip4Pdu::data());
     header->ttl = ttl;
 }
+
 void Ip4Pdu::proto(uint8_t proto)
 {
     auto header = static_cast<Ip4Header* const>(Ip4Pdu::data());
     header->proto = proto;
 }
+
 void Ip4Pdu::chksum(uint16_t chksum)
 {
     auto header = static_cast<Ip4Header* const>(Ip4Pdu::data());
     header->chksum = htons(chksum);
 }
+
 void Ip4Pdu::sip(const Ip4Addr& sip)
 {
     auto header = static_cast<Ip4Header* const>(Ip4Pdu::data());
     std::copy(sip.cbegin(), sip.cend(), header->sip);
 
 }
+
 void Ip4Pdu::dip(const Ip4Addr& dip)
 {
     auto header = static_cast<Ip4Header* const>(Ip4Pdu::data());
     std::copy(dip.cbegin(), dip.cend(), header->dip);
 }
+
 /*
 void Ip4Pdu::print(std::stringstream& sstr) const
 {

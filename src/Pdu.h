@@ -27,12 +27,12 @@ protected:
     size_t m_size;
     uint8_t* m_data;
 public:
-    explicit Pdu();
-    explicit Pdu(const uint8_t*, size_t);
-    explicit Pdu(size_t);
-
+    explicit Pdu() = default;
     void* data() const;
     size_t size() const;
+
+    void parse(size_t);
+    void parse(const uint8_t*, size_t);
 
     virtual ~Pdu();
 

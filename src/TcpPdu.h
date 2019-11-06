@@ -18,17 +18,19 @@ struct TcpHeader {
     uint16_t winsize;
     uint16_t chksum;
     uint16_t urgptr;
-    uint8_t options[40];
 } __attribute__((packed));
 
 class TcpPdu: public Pdu
 {
+private:
+    std::vector<uint8_t> m_options;
 public:
     explicit TcpPdu();
     explicit TcpPdu(const TcpHeader& header);
     explicit TcpPdu(const TcpHeader* header);
     explicit TcpPdu(const uint8_t* header);
 
+    constexpr uint8_t defaultSize() const;
     uint16_t sport() const;
     uint16_t dport() const;
     uint32_t seqnum() const;

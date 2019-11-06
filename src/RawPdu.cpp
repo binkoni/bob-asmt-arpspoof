@@ -10,9 +10,10 @@ void RawPdu::print(std::stringstream& sstr) const
     sstr << RawPdu::toString();
 }
 */
-RawPdu::RawPdu(const uint8_t* data, size_t size):
-Pdu{data, size}
-{}
+RawPdu::RawPdu(const uint8_t* data, size_t size)
+{
+    Pdu::parse(data, size);
+}
 
 std::string RawPdu::toString() const
 {

@@ -20,17 +20,19 @@ struct Ip4Header
     uint16_t chksum;
     uint8_t sip[4];
     uint8_t dip[4];
-    uint8_t options[40];
 } __attribute__((packed));
 
 class Ip4Pdu: public Pdu
 {
+private:
+    std::vector<uint8_t> m_options;
 public:
     explicit Ip4Pdu();
     explicit Ip4Pdu(const Ip4Header& header);
     explicit Ip4Pdu(const Ip4Header* header);
     explicit Ip4Pdu(const uint8_t* header);
 
+    constexpr uint8_t defaultSize() const;
     uint8_t hlen() const;
     uint8_t ver() const;
     uint8_t tos() const;

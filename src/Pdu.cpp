@@ -9,24 +9,29 @@
 #include "Ip4Pdu.h"
 #include "TcpPdu.h"
 
-Pdu::Pdu() {}
+Pdu::Pdu()
+{
+    m_size = 0;
+    m_data = nullptr;
+}
 
-Pdu::Pdu(const uint8_t* data, size_t size)
+Pdu::parse(const uint8_t* data, size_t size)
 {
     m_size = size;
-    m_data = static_cast<uint8_t*>(malloc(m_size));
+    m_data = static_cast<uint8_t*>(realloc(m_data, m_size));
     std::memcpy(m_data, data, size);
 }
 
-Pdu::Pdu(size_t size)
+Pdu::parse(size_t size)
 {
     m_size = size;
-    m_data = static_cast<uint8_t*>(calloc(m_size, sizeof(unsigned char)));
+    m_data = static_cast<uint8_t*>(realloc(m_data, m_size));
 }
 
 Pdu::~Pdu()
 {
-    delete m_data;
+    if(m_data != nullptr)
+        delete m_data;
 }
 
 void* Pdu::data() const

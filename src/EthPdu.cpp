@@ -7,21 +7,25 @@
 #include "MacAddr.h"
 #include "Pdu.h"
 
-EthPdu::EthPdu(const EthHeader& header):
-    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(EthHeader)}
-{}
+EthPdu::EthPdu(const EthHeader& header)
+{
+    Pdu::parse(&header, sizeof(EthHeader);
+}
 
 EthPdu::EthPdu(const EthHeader* header):
-    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(EthHeader)}
-{}
+{
+    Pdu::parse(reinterpret_cast<const uint8_t*>(header), sizeof(EthHeader));
+}
 
 EthPdu::EthPdu(const uint8_t* header):
-    Pdu{header, sizeof(EthHeader)}
-{}
+{
+    Pdu::parse(header, sizeof(EthHeader));
+}
 
 EthPdu::EthPdu():
-    Pdu{sizeof(EthHeader)}
-{}
+{
+    Pdu::parse(sizeof(EthHeader));
+}
 
 MacAddr EthPdu::dmac()
 {
