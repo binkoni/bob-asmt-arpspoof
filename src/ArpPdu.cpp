@@ -14,21 +14,25 @@
 #include "Packet.h"
 #include "Pdu.h"
 
-ArpPdu::ArpPdu():
-    Pdu{sizeof(ArpHeader)}
-{}
+ArpPdu::ArpPdu()
+{
+    Pdu::parse(sizeof(ArpHeader));
+}
 
-ArpPdu::ArpPdu(const ArpHeader& header):
-    Pdu{reinterpret_cast<const uint8_t*>(&header), sizeof(ArpHeader)}
-{}
+ArpPdu::ArpPdu(const ArpHeader& header)
+{
+    Pdu::parse(reinterpret_cast<const uint8_t*>(&header), sizeof(ArpHeader));
+}
 
-ArpPdu::ArpPdu(const ArpHeader* header):
-    Pdu{reinterpret_cast<const uint8_t*>(header), sizeof(ArpHeader)}
-{}
+ArpPdu::ArpPdu(const ArpHeader* header)
+{
+    Pdu::parse(reinterpret_cast<const uint8_t*>(header), sizeof(ArpHeader));
+}
 
-ArpPdu::ArpPdu(const uint8_t* header):
-    Pdu{header, sizeof(ArpHeader)}
-{}
+ArpPdu::ArpPdu(const uint8_t* header)
+{
+    Pdu::parse(header, sizeof(ArpHeader));
+}
 
 uint16_t ArpPdu::htype()
 {

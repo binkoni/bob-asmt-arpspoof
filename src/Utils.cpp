@@ -3,7 +3,7 @@
 #include <arpa/inet.h>
 #include <linux/if.h>
 #include <sys/ioctl.h>
-#include <stropts.h>
+//#include <stropts.h>
 #include <iostream>
 #include <memory>
 #include "Utils.h"

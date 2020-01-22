@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <sstream>
+#include <vector>
 
 #include "Ip4Addr.h"
 #include "Pdu.h"
@@ -28,6 +29,7 @@ private:
     std::vector<uint8_t> m_options;
 public:
     explicit Ip4Pdu();
+    explicit Ip4Pdu(size_t hlen);
     explicit Ip4Pdu(const Ip4Header& header);
     explicit Ip4Pdu(const Ip4Header* header);
     explicit Ip4Pdu(const uint8_t* header);

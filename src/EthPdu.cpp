@@ -9,37 +9,37 @@
 
 EthPdu::EthPdu(const EthHeader& header)
 {
-    Pdu::parse(&header, sizeof(EthHeader);
+    Pdu::parse(reinterpret_cast<const uint8_t*>(&header), sizeof(EthHeader));
 }
 
-EthPdu::EthPdu(const EthHeader* header):
+EthPdu::EthPdu(const EthHeader* header)
 {
     Pdu::parse(reinterpret_cast<const uint8_t*>(header), sizeof(EthHeader));
 }
 
-EthPdu::EthPdu(const uint8_t* header):
+EthPdu::EthPdu(const uint8_t* header)
 {
     Pdu::parse(header, sizeof(EthHeader));
 }
 
-EthPdu::EthPdu():
+EthPdu::EthPdu()
 {
     Pdu::parse(sizeof(EthHeader));
 }
 
-MacAddr EthPdu::dmac()
+MacAddr EthPdu::dmac() const
 {
     auto header = static_cast<EthHeader* const>(EthPdu::data());
     return MacAddr{header->dmac};
 }
 
-MacAddr EthPdu::smac()
+MacAddr EthPdu::smac() const
 {
     auto header = static_cast<EthHeader* const>(EthPdu::data());
     return MacAddr{header->smac};
 }
 
-uint16_t EthPdu::ethtype()
+uint16_t EthPdu::ethtype() const
 {
     auto header = static_cast<EthHeader* const>(EthPdu::data());
     return ntohs(header->ethtype);

@@ -132,36 +132,37 @@ int main(int argc, char* argv[])
         std::cout << std::string(10, '-') << std::endl;
     }
 
-    EthPdu ethPdu{};
-    auto ethPduStruct = static_cast<EthPduStruct*>(ethPdu.headerStruct());
-    ethPduStruct->smac[0] = 0x00;
-    ethPduStruct->smac[1] = 0x00;
-    ethPduStruct->smac[2] = 0x00;
-    ethPduStruct->smac[3] = 0x00;
-    ethPduStruct->smac[4] = 0x00;
-    ethPduStruct->smac[5] = 0x00;
-
-    ethPduStruct->dmac[0] = 0x00;
-    ethPduStruct->dmac[1] = 0x01;
-    ethPduStruct->dmac[2] = 0x02;
-    ethPduStruct->dmac[3] = 0x03;
-    ethPduStruct->dmac[4] = 0x04;
-    ethPduStruct->dmac[5] = 0x05;
-    ethPduStruct->ethtype = ETHERTYPE_LOOPBACK;
-    
-    ArpPdu arpPdu{};
-    auto arpPduStruct = static_cast<ArpPduStruct*>(arpPdu.headerStruct());
-
     Packet packet;
 
-    packet += &ethPdu;
+    EthHeader ethHeader;
+    ethHeader.smac[0] = 0x00;
+    ethHeader.smac[1] = 0x00;
+    ethHeader.smac[2] = 0x00;
+    ethHeader.smac[3] = 0x00;
+    ethHeader.smac[4] = 0x00;
+    ethHeader.smac[5] = 0x00;
 
+    ethHeader.dmac[0] = 0x00;
+    ethHeader.dmac[1] = 0x01;
+    ethHeader.dmac[2] = 0x02;
+    ethHeader.dmac[3] = 0x03;
+    ethHeader.dmac[4] = 0x04;
+    ethHeader.dmac[5] = 0x05;
+    ethHeader.ethtype = ETHERTYPE_LOOPBACK;
+
+    packet << std::make_unique<EthPdu>(&ethHeader);
+
+    ArpHeader arpHeader;
+    ArpPdu arpPdu{&arpHeader};
+
+
+/*
     packet.send(handle);
     if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header), 10) == -2)
         return -1;
-    if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthPduStruct) - 10) == -2)
+    if(pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&header) + 10, sizeof(EthHeader) - 10) == -2)
         return -1;
-
+*/
     std::cout << Utils::getMyIp("wlp1s0").toString() << std::endl;
     std::cout << Utils::getMyMac("wlp1s0").toString() << std::endl;
 }

@@ -21,11 +21,11 @@ TcpPdu::TcpPdu(const uint8_t* header)
 }
 
 TcpPdu::TcpPdu(const TcpHeader& header):
-TcpPdu::TcpPdu{reinterpret_cast<const uint8_t*>(&header), sizeof(TcpHeader)}
+TcpPdu::TcpPdu{reinterpret_cast<const uint8_t*>(&header)}
 {}
 
 TcpPdu::TcpPdu(const TcpHeader* header):
-TcpPdu::TcpPdu{reinterpret_cast<const uint8_t*>(header), sizeof(TcpHeader)}
+TcpPdu::TcpPdu{reinterpret_cast<const uint8_t*>(header)}
 {}
 
 constexpr uint8_t TcpPdu::defaultSize() const
@@ -89,9 +89,9 @@ uint16_t TcpPdu::urgptr() const
 
 std::array<uint8_t, 8> TcpPdu::options() const
 {
-    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    //auto header = static_cast<TcpHeader* const>(TcpPdu::data());
     std::array<uint8_t, 8> options;
-    std::copy_n(header->options, 8, options.begin());
+    std::copy_n(m_options.begin(), 8, options.begin());
     return options;
 }
 
@@ -101,6 +101,61 @@ void TcpPdu::print(std::stringstream& sstr) const
     sstr << TcpPdu::toString() << std::endl;
 }
 */
+
+void TcpPdu::sport(uint16_t sport)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->sport = htons(sport);
+}
+
+void TcpPdu::dport(uint16_t dport)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->dport = htons(dport);
+}
+
+void TcpPdu::seqnum(uint32_t seqnum)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->seqnum = seqnum;
+}
+
+void TcpPdu::acknum(uint32_t acknum)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->acknum = acknum;
+}
+
+void TcpPdu::hlen(uint8_t hlen)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->hlen = hlen;
+}
+
+void TcpPdu::flags(uint16_t flags)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->flags = flags;
+}
+
+void TcpPdu::winsize(uint16_t winsize)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->winsize = winsize;
+}
+
+void TcpPdu::chksum(uint16_t chksum)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->chksum = chksum;
+}
+
+void TcpPdu::urgptr(uint16_t urgptr)
+{
+    auto header = static_cast<TcpHeader* const>(TcpPdu::data());
+    header->urgptr = urgptr;
+}
+
 std::string TcpPdu::toString() const
 {
     std::stringstream sstr;

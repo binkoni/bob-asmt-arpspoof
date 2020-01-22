@@ -10,7 +10,7 @@ Ip4Pdu::Ip4Pdu(size_t hlen)
     Ip4Pdu::hlen(hlen);
 }
 
-Ip4Pdu::Ip4Pdu(const uint8_t* header):
+Ip4Pdu::Ip4Pdu(const uint8_t* header)
 {
     Pdu::parse(header, sizeof(Ip4Header));
     const auto hlen = Ip4Pdu::hlen();
@@ -19,11 +19,11 @@ Ip4Pdu::Ip4Pdu(const uint8_t* header):
 }
 
 Ip4Pdu::Ip4Pdu(const Ip4Header& header):
-Ip4Pdu::Ip4Pdu(reinterpret_cast<const uint8_t*>(&header), sizeof(Ip4Header));
+Ip4Pdu::Ip4Pdu(reinterpret_cast<const uint8_t*>(&header))
 {}
 
 Ip4Pdu::Ip4Pdu(const Ip4Header* header):
-Ip4Pdu::Ip4Pdu(reinterpret_cast<const uint8_t*>(header), sizeof(Ip4Header));
+Ip4Pdu::Ip4Pdu(reinterpret_cast<const uint8_t*>(header))
 {}
 
 constexpr uint8_t Ip4Pdu::defaultSize() const

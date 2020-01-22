@@ -27,7 +27,7 @@ protected:
     size_t m_size;
     uint8_t* m_data;
 public:
-    explicit Pdu() = default;
+    explicit Pdu();
     void* data() const;
     size_t size() const;
 

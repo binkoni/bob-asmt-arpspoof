@@ -26,6 +26,7 @@ private:
     std::vector<uint8_t> m_options;
 public:
     explicit TcpPdu();
+    explicit TcpPdu(size_t hlen);
     explicit TcpPdu(const TcpHeader& header);
     explicit TcpPdu(const TcpHeader* header);
     explicit TcpPdu(const uint8_t* header);
@@ -40,6 +41,17 @@ public:
     uint16_t winsize() const;
     uint16_t chksum() const;
     uint16_t urgptr() const;
+
+    void sport(uint16_t);
+    void dport(uint16_t);
+    void seqnum(uint32_t);
+    void acknum(uint32_t);
+    void hlen(uint8_t);
+    void flags(uint16_t);
+    void winsize(uint16_t);
+    void chksum(uint16_t);
+    void urgptr(uint16_t);
+
     std::array<uint8_t, 8> options() const;
 
     //virtual void print(std::stringstream& sstr) const;

@@ -15,14 +15,14 @@ Pdu::Pdu()
     m_data = nullptr;
 }
 
-Pdu::parse(const uint8_t* data, size_t size)
+void Pdu::parse(const uint8_t* data, size_t size)
 {
     m_size = size;
     m_data = static_cast<uint8_t*>(realloc(m_data, m_size));
     std::memcpy(m_data, data, size);
 }
 
-Pdu::parse(size_t size)
+void Pdu::parse(size_t size)
 {
     m_size = size;
     m_data = static_cast<uint8_t*>(realloc(m_data, m_size));

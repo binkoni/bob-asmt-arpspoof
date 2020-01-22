@@ -31,6 +31,10 @@ public:
     void smac(const MacAddr&);
     void ethtype(uint16_t);
 
+    MacAddr dmac() const;
+    MacAddr smac() const;
+    uint16_t ethtype() const;
+
     /*
     virtual void print(std::stringstream& sstr) const override;
     */
